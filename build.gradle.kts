@@ -106,6 +106,7 @@ publishing {
     publications.create<MavenPublication>("devBundle") {
         artifact(tasks.generateDevelopmentBundle) {
             artifactId = "dev-bundle"
+            groupId = "purpur"
         }
     }
 }

@@ -1,0 +1,19 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <72511773+xVorttex@users.noreply.github.com>
+Date: Tue, 25 Jul 2023 17:42:19 +0300
+Subject: [PATCH] md-5 chat
+
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 6b28af0e26ab2fc99f684414e2701486f68a6c41..d6476f776e0d5c46c84846fe32607727dac40368 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -29,7 +29,7 @@ dependencies {
+     // api dependencies are listed transitively to API consumers
+     api("com.google.guava:guava:31.1-jre")
+     api("com.google.code.gson:gson:2.10")
+-    api("net.md-5:bungeecord-chat:1.16-R0.4-deprecated+build.9") // Paper
++    api("net.md-5:bungeecord-chat:1.16-R0.4") // Paper
+     api("org.yaml:snakeyaml:2.0")
+     api("org.joml:joml:1.10.5")
+     // Paper start
