@@ -1,0 +1,35 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <72511773+xVorttex@users.noreply.github.com>
+Date: Tue, 25 Jul 2023 17:21:16 +0300
+Subject: [PATCH] Named spawn packet helpers
+
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddPlayerPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddPlayerPacket.java
+index ab823de3fe0eb4870cd7fec543730d6d17060940..901bdd3a53f453afea341f91ac1ee4eb35eb4894 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddPlayerPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddPlayerPacket.java
+@@ -4,6 +4,7 @@ import java.util.UUID;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.entity.player.Player;
++import org.bukkit.Location;
+ 
+ public class ClientboundAddPlayerPacket implements Packet<ClientGamePacketListener> {
+     private final int entityId;
+@@ -24,6 +25,16 @@ public class ClientboundAddPlayerPacket implements Packet<ClientGamePacketListen
+         this.xRot = (byte)((int)(player.getXRot() * 256.0F / 360.0F));
+     }
+ 
++    public ClientboundAddPlayerPacket(int entityId, UUID id, Location location) {
++        this.entityId = entityId;
++        this.playerId = id;
++        this.x = location.getX();
++        this.y = location.getY();
++        this.z = location.getZ();
++        this.yRot = (byte)((int)(location.getPitch() * 256.0F / 360.0F));
++        this.xRot = (byte)((int)(location.getYaw() * 256.0F / 360.0F));
++    }
++
+     public ClientboundAddPlayerPacket(FriendlyByteBuf buf) {
+         this.entityId = buf.readVarInt();
+         this.playerId = buf.readUUID();
