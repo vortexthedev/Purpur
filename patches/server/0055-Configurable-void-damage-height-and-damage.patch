@@ -5,10 +5,10 @@ Subject: [PATCH] Configurable void damage height and damage
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
-index a916cc58909f3962ce2f17fc6655309a427ee064..cbbe526889745b90f6a156d3c653300cc716cd9e 100644
+index acce1d46d6bce9b052126c76bc1f36264df39e71..5b9ddcab26a4c962dae104c44d65d623c036c8fd 100644
 --- a/src/main/java/net/minecraft/world/entity/Entity.java
 +++ b/src/main/java/net/minecraft/world/entity/Entity.java
-@@ -913,7 +913,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
+@@ -915,7 +915,7 @@ public abstract class Entity implements Nameable, EntityAccess, CommandSource {
  
      public void checkBelowWorld() {
          // Paper start - Configurable nether ceiling damage
@@ -18,10 +18,10 @@ index a916cc58909f3962ce2f17fc6655309a427ee064..cbbe526889745b90f6a156d3c653300c
              && (!(this instanceof Player player) || !player.getAbilities().invulnerable))) {
              // Paper end
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index b3699225e2dc77c6d201e361c8d447395c3f3e62..b8e6d0bd2ba18d7e0bf7cd78db8f98d4f1467d71 100644
+index bb8ba67c7a4a4c7a641e103bd20cbc0a01dc66b2..c32a8c4b8a75f524b0f99ada0bba6de40c0aa732 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -2496,7 +2496,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -2500,7 +2500,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
  
      @Override
      protected void onBelowWorld() {
@@ -31,10 +31,10 @@ index b3699225e2dc77c6d201e361c8d447395c3f3e62..b8e6d0bd2ba18d7e0bf7cd78db8f98d4
  
      protected void updateSwingTime() {
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-index b4eb7a279b8e70b7601c0101d3f7c47185fa2deb..f1e1f46d2e2847641bbb812376ad3167366f4ba3 100644
+index 183a4e0192679d04555215c234dfefbc39dfe02e..a559ab65bc3f2d78d79e22b0e70afb6affd1d6a3 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-@@ -99,10 +99,14 @@ public class PurpurWorldConfig {
+@@ -98,10 +98,14 @@ public class PurpurWorldConfig {
      public boolean disableDropsOnCrammingDeath = false;
      public boolean milkCuresBadOmen = true;
      public double tridentLoyaltyVoidReturnHeight = 0.0D;

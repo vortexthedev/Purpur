@@ -5,7 +5,7 @@ Subject: [PATCH] Rebrand
 
 
 diff --git a/build.gradle.kts b/build.gradle.kts
-index 3e651dd361ce4a0ccb20d624dc878e16b3bb62f5..240394b1d9dd1449674a299aa73fa155be2d3d82 100644
+index f6cd7b910ce41a254e71bf0fcfe93c38abbb1445..139e2b17b899da6f0147bb8b4412e2e54e817be4 100644
 --- a/build.gradle.kts
 +++ b/build.gradle.kts
 @@ -13,12 +13,12 @@ configurations.named(log4jPlugins.compileClasspathConfigurationName) {
@@ -177,10 +177,10 @@ index abe37c7c3c6f5ab73afd738ec78f06d7e4d2ed96..b5b6657e52e4f7a630229bd3ba433438
          stringbuilder.append(CrashReport.getErrorComment());
          stringbuilder.append("\n\n");
 diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
-index 7ca6c81afc99d42d2f39b4b6d7f5e8a18b58fba3..34737c730d724d4be67d480587a17792fd3a11f0 100644
+index 67cba5cf510e4a602121e10c015a491650127752..ec6ac4baedf3fa7edd80695112b228a642baf4e2 100644
 --- a/src/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/src/main/java/net/minecraft/server/MinecraftServer.java
-@@ -923,7 +923,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -922,7 +922,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
          shutdownThread = Thread.currentThread();
          org.spigotmc.WatchdogThread.doStop(); // Paper
          if (!isSameThread()) {
@@ -189,7 +189,7 @@ index 7ca6c81afc99d42d2f39b4b6d7f5e8a18b58fba3..34737c730d724d4be67d480587a17792
              while (this.getRunningThread().isAlive()) {
                  this.getRunningThread().stop();
                  try {
-@@ -1695,7 +1695,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
+@@ -1694,7 +1694,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
  
      @DontObfuscate
      public String getServerModName() {
@@ -199,10 +199,10 @@ index 7ca6c81afc99d42d2f39b4b6d7f5e8a18b58fba3..34737c730d724d4be67d480587a17792
  
      public SystemReport fillSystemReport(SystemReport details) {
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index bc9a4dc04589d4241560f73ae8c64f2fb8f6a4ca..08c5f45c044f6c882a985fbc071ff7616d0df4c1 100644
+index 74c46cea456f4a736325892bb7b4d0f1b35b62cd..4a5804e14b82229fc4b4bf44725d79f55d0d4c80 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -264,7 +264,7 @@ import javax.annotation.Nullable; // Paper
+@@ -265,7 +265,7 @@ import javax.annotation.Nullable; // Paper
  import javax.annotation.Nonnull; // Paper
  
  public final class CraftServer implements Server {
@@ -239,10 +239,10 @@ index 4e56018b64d11f76c8da43fd8f85c6de72204e36..9607675e6c5bff2183c4420d11fc63ee
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-index 6095d43e08bc1ffc4e9a4796fc7adbd07d69d716..7e81ed767bab14eeba1492a05c7ce43cfc2abd5b 100644
+index f0ce29d21fe9af803ce4e41b8c037b2ec5d1b124..7bc8b62ff6aa355f3f025fc6c3a3d4c6b355853b 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-@@ -912,7 +912,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
+@@ -907,7 +907,7 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
              return EntityCategory.WATER;
          }
  
@@ -265,7 +265,7 @@ index d7ce4971d9271dbeff4adb9d852e4e7bdf60bf03..5a47a8785bc2e251d041f80a79295c43
                  // (async tasks must live with race-conditions if they attempt to cancel between these few lines of code)
              }
 diff --git a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
-index 1adf1ab6af94b561dc8cbbd3e5746e0bb2a11d41..0aee1fadaeb948fd90d8e61ac57dbe7f810529ff 100644
+index 2b4581f92543c11f31bcc1417e90d7f90b2aea20..ffca5970a6259b024c9aa935e22cf72ed8cd8e9f 100644
 --- a/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 +++ b/src/main/java/org/bukkit/craftbukkit/util/CraftMagicNumbers.java
 @@ -470,7 +470,7 @@ public final class CraftMagicNumbers implements UnsafeValues {

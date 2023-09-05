@@ -5,10 +5,10 @@ Subject: [PATCH] Add option to teleport to spawn if outside world border
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 373f3f7643bd3ee49f3b10f9e963b39b28c39894..91df087b49d39b318af85dcbcf2db600e5c12222 100644
+index 03b19d56e4f75d71f592f400f59c9becd39c4d4f..459f8bcf13ed759c40eff1ade5d9011ede8547c3 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -2762,4 +2762,26 @@ public class ServerPlayer extends Player {
+@@ -2764,4 +2764,26 @@ public class ServerPlayer extends Player {
          return (CraftPlayer) super.getBukkitEntity();
      }
      // CraftBukkit end
@@ -48,10 +48,10 @@ index 35e3cac34a6a508fbf3971cff9ac07db48ddeaae..8c0ef795691aa17e9522b2deda794bcd
                          }
                      }
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-index 6ecd7f9a3dfb2ddb630b88d072a8bbb5874bcb0a..f7edb363baab75979c7546bda8051cd8f81252cb 100644
+index d315a4aac382462b1bd0d44b6b5a88552f663d36..8fdbaa0cd95186b3b48aac1eb953e268554726e4 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-@@ -245,6 +245,7 @@ public class PurpurWorldConfig {
+@@ -244,6 +244,7 @@ public class PurpurWorldConfig {
      public boolean playerInvulnerableWhileAcceptingResourcePack = false;
      public String playerDeathExpDropEquation = "expLevel * 7";
      public int playerDeathExpDropMax = 100;
@@ -59,7 +59,7 @@ index 6ecd7f9a3dfb2ddb630b88d072a8bbb5874bcb0a..f7edb363baab75979c7546bda8051cd8
      private void playerSettings() {
          if (PurpurConfig.version < 19) {
              boolean oldVal = getBoolean("gameplay-mechanics.player.idle-timeout.mods-target", idleTimeoutTargetPlayer);
-@@ -260,6 +261,7 @@ public class PurpurWorldConfig {
+@@ -259,6 +260,7 @@ public class PurpurWorldConfig {
          playerInvulnerableWhileAcceptingResourcePack = getBoolean("gameplay-mechanics.player.invulnerable-while-accepting-resource-pack", playerInvulnerableWhileAcceptingResourcePack);
          playerDeathExpDropEquation = getString("gameplay-mechanics.player.exp-dropped-on-death.equation", playerDeathExpDropEquation);
          playerDeathExpDropMax = getInt("gameplay-mechanics.player.exp-dropped-on-death.maximum", playerDeathExpDropMax);

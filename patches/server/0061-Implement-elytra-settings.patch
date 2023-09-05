@@ -5,10 +5,10 @@ Subject: [PATCH] Implement elytra settings
 
 
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index b8e6d0bd2ba18d7e0bf7cd78db8f98d4f1467d71..35e3cac34a6a508fbf3971cff9ac07db48ddeaae 100644
+index c32a8c4b8a75f524b0f99ada0bba6de40c0aa732..4133db59cf52664354ce1a2e8bbacbad51e09861 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-@@ -3519,7 +3519,16 @@ public abstract class LivingEntity extends Entity implements Attackable {
+@@ -3523,7 +3523,16 @@ public abstract class LivingEntity extends Entity implements Attackable {
                      int j = i / 10;
  
                      if (j % 2 == 0) {
@@ -54,10 +54,10 @@ index 82b0bda3e35ec2157a477e1a17b2b46baadc97d9..0fc45b1048a1c4e0dc2bd1ae0437eecb
                      itemStack.shrink(1);
                      } else ((net.minecraft.server.level.ServerPlayer) user).getBukkitEntity().updateInventory();
 diff --git a/src/main/java/net/minecraft/world/item/ItemStack.java b/src/main/java/net/minecraft/world/item/ItemStack.java
-index 11d6c0a2089ff8e95b94ded88ae11360ffd9c01e..73219dc7f1fcb3f7457de513e865385a09ab1914 100644
+index d8c1c16d3c4b35860e860cf6aef774916822ec9c..33548cd10758f3cc891c40d760b9e0a86dc8a2cb 100644
 --- a/src/main/java/net/minecraft/world/item/ItemStack.java
 +++ b/src/main/java/net/minecraft/world/item/ItemStack.java
-@@ -608,7 +608,7 @@ public final class ItemStack {
+@@ -612,7 +612,7 @@ public final class ItemStack {
              int j;
  
              if (amount > 0) {
@@ -66,7 +66,7 @@ index 11d6c0a2089ff8e95b94ded88ae11360ffd9c01e..73219dc7f1fcb3f7457de513e865385a
                  int k = 0;
  
                  for (int l = 0; j > 0 && l < amount; ++l) {
-@@ -663,6 +663,12 @@ public final class ItemStack {
+@@ -667,6 +667,12 @@ public final class ItemStack {
                  if (this.hurt(amount, entity.getRandom(), entity /*instanceof ServerPlayer ? (ServerPlayer) entity : null*/)) { // Paper - pass LivingEntity for EntityItemDamageEvent
                      breakCallback.accept(entity);
                      Item item = this.getItem();
@@ -99,10 +99,10 @@ index 8078f127ff4b6e0aafb5804b9c02e237f79445b5..06c2f30b77a2c8aecc65e0c305f643d5
                          entityhuman.startAutoSpinAttack(20);
                          if (entityhuman.onGround()) {
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-index cc673b3daa8a5edd24cdf05d21c4dc2c6fbb7a42..11cb390065f9165d6a786cd9004f194e077a5e3b 100644
+index 9e4428db0ffa0f1b0e0ae11af903d3449c782ee4..abecd27fab86cb5c16b3d42d5f499caa1976bd45 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-@@ -113,6 +113,19 @@ public class PurpurWorldConfig {
+@@ -112,6 +112,19 @@ public class PurpurWorldConfig {
          voidDamageDealt = getDouble("gameplay-mechanics.void-damage-dealt", voidDamageDealt);
      }
  

@@ -5,10 +5,10 @@ Subject: [PATCH] Alternative Keepalive Handling
 
 
 diff --git a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-index d91fd3fa0f08dc43641ad628f26be123548ddf4e..bcce3550b8bde5eb9b187e99349044e7a9538e5a 100644
+index 81cbb6a55fd3e6a3b9ec96cc54b43e123c243482..317342df5d3afe65e09853fd9ffe4aca127152d2 100644
 --- a/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/src/main/java/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -263,6 +263,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -265,6 +265,7 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
      private long keepAliveTime = Util.getMillis();
      private boolean keepAlivePending;
      private long keepAliveChallenge;
@@ -16,7 +16,7 @@ index d91fd3fa0f08dc43641ad628f26be123548ddf4e..bcce3550b8bde5eb9b187e99349044e7
      // CraftBukkit start - multithreaded fields
      private final AtomicInteger chatSpamTickCount = new AtomicInteger();
      private final java.util.concurrent.atomic.AtomicInteger tabSpamLimiter = new java.util.concurrent.atomic.AtomicInteger(); // Paper - configurable tab spam limits
-@@ -415,6 +416,21 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -417,6 +418,21 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
          long currentTime = Util.getMillis();
          long elapsedTime = currentTime - this.keepAliveTime;
  
@@ -38,7 +38,7 @@ index d91fd3fa0f08dc43641ad628f26be123548ddf4e..bcce3550b8bde5eb9b187e99349044e7
          if (this.keepAlivePending) {
              if (!this.processedDisconnect && elapsedTime >= KEEPALIVE_LIMIT) { // check keepalive limit, don't fire if already disconnected
                  ServerGamePacketListenerImpl.LOGGER.warn("{} was kicked due to keepalive timeout!", this.player.getScoreboardName()); // more info
-@@ -3500,6 +3516,16 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
+@@ -3580,6 +3596,16 @@ public class ServerGamePacketListenerImpl implements ServerPlayerConnection, Tic
  
      @Override
      public void handleKeepAlive(ServerboundKeepAlivePacket packet) {
@@ -56,7 +56,7 @@ index d91fd3fa0f08dc43641ad628f26be123548ddf4e..bcce3550b8bde5eb9b187e99349044e7
          if (this.keepAlivePending && packet.getId() == this.keepAliveChallenge) {
              int i = (int) (Util.getMillis() - this.keepAliveTime);
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurConfig.java b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
-index 16ba03a9df0c3709c4794df7cb46249bda0bbac6..fa27bb42697cd5741b7308b34cd768232604a20f 100644
+index 34afed28faeb56352b48faf8078a5fb07912eb5e..ad239ba9259c5a63b40261ebc44224893496b47d 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurConfig.java
 @@ -198,6 +198,11 @@ public class PurpurConfig {

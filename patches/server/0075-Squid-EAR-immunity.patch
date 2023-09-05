@@ -5,10 +5,10 @@ Subject: [PATCH] Squid EAR immunity
 
 
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-index f7edb363baab75979c7546bda8051cd8f81252cb..c7b6ed5e741f227a6da0f3e7c6977e822038f8e8 100644
+index 8fdbaa0cd95186b3b48aac1eb953e268554726e4..adfb558d98990739b24e10c7bf941287d30737a0 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-@@ -1458,6 +1458,7 @@ public class PurpurWorldConfig {
+@@ -1457,6 +1457,7 @@ public class PurpurWorldConfig {
      public boolean squidRidable = false;
      public boolean squidControllable = true;
      public double squidMaxHealth = 10.0D;
@@ -16,7 +16,7 @@ index f7edb363baab75979c7546bda8051cd8f81252cb..c7b6ed5e741f227a6da0f3e7c6977e82
      private void squidSettings() {
          squidRidable = getBoolean("mobs.squid.ridable", squidRidable);
          squidControllable = getBoolean("mobs.squid.controllable", squidControllable);
-@@ -1467,6 +1468,7 @@ public class PurpurWorldConfig {
+@@ -1466,6 +1467,7 @@ public class PurpurWorldConfig {
              set("mobs.squid.attributes.max_health", oldValue);
          }
          squidMaxHealth = getDouble("mobs.squid.attributes.max_health", squidMaxHealth);

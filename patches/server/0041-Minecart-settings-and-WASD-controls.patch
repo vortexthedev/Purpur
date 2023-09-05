@@ -5,10 +5,10 @@ Subject: [PATCH] Minecart settings and WASD controls
 
 
 diff --git a/src/main/java/net/minecraft/server/level/ServerPlayer.java b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-index 6838e85030667776c6b0534d0e92c9fbd68840da..fa7c220057be4d233752d9022a934d03e5f3df59 100644
+index 0b7ee1cbe2917dc81d6a740ec09e7aee9ff598cf..e5291d794f2abb719a574afef2b27d4df05d881f 100644
 --- a/src/main/java/net/minecraft/server/level/ServerPlayer.java
 +++ b/src/main/java/net/minecraft/server/level/ServerPlayer.java
-@@ -1112,6 +1112,7 @@ public class ServerPlayer extends Player {
+@@ -1113,6 +1113,7 @@ public class ServerPlayer extends Player {
          if (this.isInvulnerableTo(source)) {
              return false;
          } else {
@@ -148,10 +148,10 @@ index de4c1e4701236e7d5ec77339c51ad6a9d8288bb6..5ac102afde62c08f36886b466010ccfe
      protected ResourceLocation drops;
  
 diff --git a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-index 706b4256c81adb06284d25433ac39d54625bb14c..1011506a3008b4d01c5141d434235e2e0643bdb9 100644
+index 115085ecee8a765921d91288962f9ad8ab2391fa..df1d4a3e6cad6f8e73f28dc2c1da6c9821f6e01f 100644
 --- a/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
 +++ b/src/main/java/org/purpurmc/purpur/PurpurWorldConfig.java
-@@ -96,6 +96,68 @@ public class PurpurWorldConfig {
+@@ -95,6 +95,68 @@ public class PurpurWorldConfig {
          armorstandStepHeight = (float) getDouble("gameplay-mechanics.armorstand.step-height", armorstandStepHeight);
      }
  

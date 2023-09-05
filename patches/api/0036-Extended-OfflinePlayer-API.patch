@@ -5,10 +5,10 @@ Subject: [PATCH] Extended OfflinePlayer API
 
 
 diff --git a/src/main/java/org/bukkit/OfflinePlayer.java b/src/main/java/org/bukkit/OfflinePlayer.java
-index 4d014215dce2c2ff09a2701accf2db144603c55a..8cb7000bc5e4e3c987cb0ac73d113eedb141e178 100644
+index bce07d84cafca677bb6fad78c21b82097f06430c..4ef0fa4f1ef72bb784674671473c6a322acadecc 100644
 --- a/src/main/java/org/bukkit/OfflinePlayer.java
 +++ b/src/main/java/org/bukkit/OfflinePlayer.java
-@@ -476,4 +476,114 @@ public interface OfflinePlayer extends ServerOperator, AnimalTamer, Configuratio
+@@ -522,4 +522,114 @@ public interface OfflinePlayer extends ServerOperator, AnimalTamer, Configuratio
       */
      @Nullable
      public Location getLastDeathLocation();
