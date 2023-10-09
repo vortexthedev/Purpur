@@ -5,10 +5,10 @@ Subject: [PATCH] Debug Marker API
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-index 790bf8b0a87c00a45fac2737b6148b2144f838e7..5ac085f56464dfd9ff6b3786968ad43f4f506371 100644
+index ab31661318beb96bc18b270cc614adcf0ea86d08..9bb5c8a2480dbb86c022d9a83b892d28cf232e8d 100644
 --- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
-@@ -1566,6 +1566,42 @@ public final class CraftServer implements Server {
+@@ -1546,6 +1546,42 @@ public final class CraftServer implements Server {
      public void removeFuel(org.bukkit.Material material) {
          net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity.removeFuel(net.minecraft.world.item.ItemStack.fromBukkitCopy(new ItemStack(material)));
      }
@@ -99,7 +99,7 @@ index a2e852adf47261b1b2eb9734cc90f4676ed58126..1392e483c363e25d1f16465d876cb7d7
  
      @Override
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 5baf36d8d65574f3e57de0937a949cff03435d30..beae58414b27d2a33bb6507ae8ab2104fde2cc0e 100644
+index 9c093c406711047a450624e2d137677b1cd4d4b7..c5729a6b326846c5f01bbb413177e244f32a48f1 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -3334,5 +3334,48 @@ public class CraftPlayer extends CraftHumanEntity implements Player {

@@ -32,7 +32,7 @@ index dbd61da31192896ced9839cf8a3b123a6625ae60..68be1bb59c7e5176c82ed128be5296a2
          return this.hardCollides;
      }
 diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
-index 4ab8dca4b0f1f555c4ef4963a429dd4c0d28b06c..4c5a0644918dc912feef17470d7fcfd1a3b14d88 100644
+index 011ed6108e3caf3836809fb1d065714ba360c589..5964f72d866539722082d6a9d1ebb3ec7dc960ab 100644
 --- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
 +++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
 @@ -263,6 +263,7 @@ public abstract class LivingEntity extends Entity implements Attackable {
@@ -92,10 +92,10 @@ index 4ab8dca4b0f1f555c4ef4963a429dd4c0d28b06c..4c5a0644918dc912feef17470d7fcfd1
  
      public boolean isSensitiveToWater() {
 diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
-index d24f94f2c27523af10184cae27157169d5deabae..7dae759b777cf9077bf46d2e1189c20c1c2db60e 100644
+index 6ae71386cdc0d30defd9a86b97f5e619d2dbf5fe..1910f1ad22b2d2b79ad0161d20dcc9772ff2bd7f 100644
 --- a/src/main/java/net/minecraft/world/entity/Mob.java
 +++ b/src/main/java/net/minecraft/world/entity/Mob.java
-@@ -1739,17 +1739,7 @@ public abstract class Mob extends LivingEntity implements Targeting {
+@@ -1746,17 +1746,7 @@ public abstract class Mob extends LivingEntity implements Targeting {
      }
  
      public boolean isSunBurnTick() {
@@ -115,7 +115,7 @@ index d24f94f2c27523af10184cae27157169d5deabae..7dae759b777cf9077bf46d2e1189c20c
  
      @Override
 diff --git a/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java b/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
-index 93443238b77c04f6a9da3c25427d200ccf4699f8..892ae3a9ac2395896ff7881c49eaece8d46e831e 100644
+index b31076f93fda4db8306135a2679be598063b2e09..de9b2bc63b46e6728acde9e7a6a7cda9b6441897 100644
 --- a/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
 +++ b/src/main/java/net/minecraft/world/entity/monster/AbstractSkeleton.java
 @@ -66,6 +66,7 @@ public abstract class AbstractSkeleton extends Monster implements RangedAttackMo
@@ -369,10 +369,10 @@ index 283836981f5ed94dfc8999c3c5450213a1f2cfc1..feeca8d318fa0b7b22e728baa3bf3269
          /*
           * Order is *EXTREMELY* important -- keep it right! =D
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-index f39747767d9a8da86bb25c34415b06172f39bcfc..72dcac5708c06556549d268e54ecb4b6e71c93be 100644
+index 88fc33afb4a88d8c8b0a41331791f1ca87b8a8fd..0c9dec743ca3d83e3443c8be31c2c1589bbfa585 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftLivingEntity.java
-@@ -1111,5 +1111,15 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
+@@ -1116,5 +1116,15 @@ public class CraftLivingEntity extends CraftEntity implements LivingEntity {
          if (slot == null) return;
          getHandle().broadcastBreakEvent(org.bukkit.craftbukkit.CraftEquipmentSlot.getNMS(slot));
      }
