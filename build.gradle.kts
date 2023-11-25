@@ -42,6 +42,7 @@ subprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
         maven(paperMavenPublicUrl)
         maven("https://jitpack.io")
     }
@@ -49,6 +50,7 @@ subprojects {
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven(paperMavenPublicUrl) {
         content {
             onlyForConfigurations(configurations.paperclip.name)

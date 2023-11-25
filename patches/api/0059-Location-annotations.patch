@@ -1,0 +1,24 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Sat, 25 Nov 2023 15:28:18 +0200
+Subject: [PATCH] Location annotations
+
+
+diff --git a/src/main/java/org/bukkit/Location.java b/src/main/java/org/bukkit/Location.java
+index f0cec595a4ae01aece52927dbcc480dceb515365..d92886f8debb56555de485f1cc37717c7793e192 100644
+--- a/src/main/java/org/bukkit/Location.java
++++ b/src/main/java/org/bukkit/Location.java
+@@ -137,11 +137,12 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+         return world;
+     }
+ 
++    @UndefinedNullability
+     public String getWorldName() {
+         return worldName;
+     }
+ 
+-    public void setWorldName(String worldName) {
++    public void setWorldName(@UndefinedNullability String worldName) {
+         this.worldName = worldName;
+     }
+ 

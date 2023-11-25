@@ -1,0 +1,731 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Sat, 25 Nov 2023 15:16:13 +0200
+Subject: [PATCH] Helpers
+
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
+index 0dd611aed9749ebed64e74fc4c2599c3c7f3ff2c..c73c324a9ef2f935e56d198b3b477b98a63a00c6 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
+@@ -9,6 +9,7 @@ import net.minecraft.util.Mth;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EntityType;
+ import net.minecraft.world.phys.Vec3;
++import org.bukkit.Location;
+ 
+ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListener> {
+     private static final double MAGICAL_QUANTIZATION = 8000.0D;
+@@ -32,11 +33,11 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+     }
+ 
+     public ClientboundAddEntityPacket(Entity entity, int entityData) {
+-        this(entity.getId(), entity.getUUID(), entity.getX(), entity.getY(), entity.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), (double)entity.getYHeadRot());
++        this(entity.getId(), entity.getUUID(), entity.getX(), entity.getY(), entity.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), (double) entity.getYHeadRot());
+     }
+ 
+     public ClientboundAddEntityPacket(Entity entity, int entityData, BlockPos pos) {
+-        this(entity.getId(), entity.getUUID(), (double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), (double)entity.getYHeadRot());
++        this(entity.getId(), entity.getUUID(), (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), (double) entity.getYHeadRot());
+     }
+ 
+     public ClientboundAddEntityPacket(int id, UUID uuid, double x, double y, double z, float pitch, float yaw, EntityType<?> entityType, int entityData, Vec3 velocity, double headYaw) {
+@@ -45,16 +46,31 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+         this.x = x;
+         this.y = y;
+         this.z = z;
+-        this.xRot = (byte)Mth.floor(pitch * 256.0F / 360.0F);
+-        this.yRot = (byte)Mth.floor(yaw * 256.0F / 360.0F);
+-        this.yHeadRot = (byte)Mth.floor(headYaw * 256.0D / 360.0D);
++        this.xRot = (byte) Mth.floor(pitch * 256.0F / 360.0F);
++        this.yRot = (byte) Mth.floor(yaw * 256.0F / 360.0F);
++        this.yHeadRot = (byte) Mth.floor(headYaw * 256.0D / 360.0D);
+         this.type = entityType;
+         this.data = entityData;
+-        this.xa = (int)(Mth.clamp(velocity.x, -3.9D, 3.9D) * 8000.0D);
+-        this.ya = (int)(Mth.clamp(velocity.y, -3.9D, 3.9D) * 8000.0D);
+-        this.za = (int)(Mth.clamp(velocity.z, -3.9D, 3.9D) * 8000.0D);
++        this.xa = (int) (Mth.clamp(velocity.x, -3.9D, 3.9D) * 8000.0D);
++        this.ya = (int) (Mth.clamp(velocity.y, -3.9D, 3.9D) * 8000.0D);
++        this.za = (int) (Mth.clamp(velocity.z, -3.9D, 3.9D) * 8000.0D);
+     }
+ 
++    public ClientboundAddEntityPacket(int id, UUID uuid, Location location) {
++        this(id, uuid,
++            location.getX(),
++            location.getY(),
++            location.getZ(),
++            location.getPitch(),
++            location.getYaw(),
++            EntityType.ARMOR_STAND,
++            0,
++            Vec3.ZERO,
++            0.0D
++        );
++    }
++
++
+     public ClientboundAddEntityPacket(FriendlyByteBuf buf) {
+         this.id = buf.readVarInt();
+         this.uuid = buf.readUUID();
+@@ -118,27 +134,27 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+     }
+ 
+     public double getXa() {
+-        return (double)this.xa / 8000.0D;
++        return (double) this.xa / 8000.0D;
+     }
+ 
+     public double getYa() {
+-        return (double)this.ya / 8000.0D;
++        return (double) this.ya / 8000.0D;
+     }
+ 
+     public double getZa() {
+-        return (double)this.za / 8000.0D;
++        return (double) this.za / 8000.0D;
+     }
+ 
+     public float getXRot() {
+-        return (float)(this.xRot * 360) / 256.0F;
++        return (float) (this.xRot * 360) / 256.0F;
+     }
+ 
+     public float getYRot() {
+-        return (float)(this.yRot * 360) / 256.0F;
++        return (float) (this.yRot * 360) / 256.0F;
+     }
+ 
+     public float getYHeadRot() {
+-        return (float)(this.yHeadRot * 360) / 256.0F;
++        return (float) (this.yHeadRot * 360) / 256.0F;
+     }
+ 
+     public int getData() {
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
+index 929483116d05a803d317ece7a44861af8bd36665..c7a674505a9ffad1029e2da1067d05caec421e93 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
+@@ -25,10 +25,16 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+         this.entries = players.stream().map(ClientboundPlayerInfoUpdatePacket.Entry::new).toList();
+     }
+ 
++    public ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action action, ClientboundPlayerInfoUpdatePacket.Entry entry) {
++        this.actions = EnumSet.of(action);
++        this.entries = List.of(entry);
++    }
++
+     public ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action action, ServerPlayer player) {
+         this.actions = EnumSet.of(action);
+         this.entries = List.of(new ClientboundPlayerInfoUpdatePacket.Entry(player));
+     }
++
+     // Paper start
+     public ClientboundPlayerInfoUpdatePacket(EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions, List<ClientboundPlayerInfoUpdatePacket.Entry> entries) {
+         this.actions = actions;
+@@ -74,7 +80,7 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+         this.entries = buf.readList((buf2) -> {
+             ClientboundPlayerInfoUpdatePacket.EntryBuilder entryBuilder = new ClientboundPlayerInfoUpdatePacket.EntryBuilder(buf2.readUUID());
+ 
+-            for(ClientboundPlayerInfoUpdatePacket.Action action : this.actions) {
++            for (ClientboundPlayerInfoUpdatePacket.Action action : this.actions) {
+                 action.reader.read(entryBuilder, buf2);
+             }
+ 
+@@ -88,7 +94,7 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+         buf.writeCollection(this.entries, (buf2, entry) -> {
+             buf2.writeUUID(entry.profileId());
+ 
+-            for(ClientboundPlayerInfoUpdatePacket.Action action : this.actions) {
++            for (ClientboundPlayerInfoUpdatePacket.Action action : this.actions) {
+                 action.writer.write(buf2, entry);
+             }
+ 
+@@ -176,15 +182,19 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+         }
+     }
+ 
+-    public static record Entry(UUID profileId, @Nullable GameProfile profile, boolean listed, int latency, GameType gameMode, @Nullable Component displayName, @Nullable RemoteChatSession.Data chatSession) {
++    public static record Entry(UUID profileId, @Nullable GameProfile profile, boolean listed, int latency,
++                               GameType gameMode, @Nullable Component displayName,
++                               @Nullable RemoteChatSession.Data chatSession) {
+         Entry(ServerPlayer player) {
+             // Paper start - add listed
+             this(player, true);
+         }
++
+         Entry(ServerPlayer player, boolean listed) {
+             this(player.getUUID(), player.getGameProfile(), listed, player.connection.latency(), player.gameMode.getGameModeForPlayer(), player.getTabListDisplayName(), Optionull.map(player.getChatSession(), RemoteChatSession::asData));
+             // Paper end - add listed
+         }
++
+         // Paper start
+         Entry(UUID profileId, boolean listed) {
+             this(profileId, null, listed, 0, GameType.DEFAULT_MODE, null, null);
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetDisplayObjectivePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetDisplayObjectivePacket.java
+index 103b2e5e3a00d1e9e86882d9fa458d0003f5b008..9f42d6788d5ff04c6cc434749dafb87a936f2b18 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetDisplayObjectivePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetDisplayObjectivePacket.java
+@@ -21,6 +21,11 @@ public class ClientboundSetDisplayObjectivePacket implements Packet<ClientGamePa
+ 
+     }
+ 
++    public ClientboundSetDisplayObjectivePacket(DisplaySlot slot, @Nullable String objectiveName) {
++        this.slot = slot;
++        this.objectiveName = Objects.requireNonNullElse(objectiveName, "");
++    }
++
+     public ClientboundSetDisplayObjectivePacket(FriendlyByteBuf buf) {
+         this.slot = buf.readById(DisplaySlot.BY_ID);
+         this.objectiveName = buf.readUtf();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetObjectivePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetObjectivePacket.java
+index 9d086186616b5768b42060912952d34c962992df..90697428b870013823bbc7764f3298f051330a5c 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetObjectivePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetObjectivePacket.java
+@@ -23,6 +23,16 @@ public class ClientboundSetObjectivePacket implements Packet<ClientGamePacketLis
+         this.method = mode;
+     }
+ 
++    public ClientboundSetObjectivePacket(String objectiveName,
++                                         Component displayName,
++                                         ObjectiveCriteria.RenderType renderType,
++                                         int mode) {
++        this.objectiveName = objectiveName;
++        this.displayName = displayName;
++        this.renderType = renderType;
++        this.method = mode;
++    }
++
+     public ClientboundSetObjectivePacket(FriendlyByteBuf buf) {
+         this.objectiveName = buf.readUtf();
+         this.method = buf.readByte();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
+index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..ec778f965c95f4fb4c97d641e04d953abd6d9932 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
+@@ -9,6 +9,7 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.scores.PlayerTeam;
++import org.bukkit.craftbukkit.util.CraftChatMessage;
+ 
+ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketListener> {
+     private static final int METHOD_ADD = 0;
+@@ -23,7 +24,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+     private final Collection<String> players;
+     private final Optional<ClientboundSetPlayerTeamPacket.Parameters> parameters;
+ 
+-    private ClientboundSetPlayerTeamPacket(String teamName, int packetType, Optional<ClientboundSetPlayerTeamPacket.Parameters> team, Collection<String> playerNames) {
++    public ClientboundSetPlayerTeamPacket(String teamName, int packetType, Optional<ClientboundSetPlayerTeamPacket.Parameters> team, Collection<String> playerNames) {
+         this.name = teamName;
+         this.method = packetType;
+         this.parameters = team;
+@@ -31,7 +32,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+     }
+ 
+     public static ClientboundSetPlayerTeamPacket createAddOrModifyPacket(PlayerTeam team, boolean updatePlayers) {
+-        return new ClientboundSetPlayerTeamPacket(team.getName(), updatePlayers ? 0 : 2, Optional.of(new ClientboundSetPlayerTeamPacket.Parameters(team)), (Collection<String>)(updatePlayers ? team.getPlayers() : ImmutableList.of()));
++        return new ClientboundSetPlayerTeamPacket(team.getName(), updatePlayers ? 0 : 2, Optional.of(new ClientboundSetPlayerTeamPacket.Parameters(team)), (Collection<String>) (updatePlayers ? team.getPlayers() : ImmutableList.of()));
+     }
+ 
+     public static ClientboundSetPlayerTeamPacket createRemovePacket(PlayerTeam team) {
+@@ -147,6 +148,26 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+         private final ChatFormatting color;
+         private final int options;
+ 
++        public Parameters(String displayName, String prefix, String suffix, String nametagVisibility, String collisionRule, ChatFormatting color, int options) {
++            this.displayName = CraftChatMessage.fromString(displayName)[0];
++            this.playerPrefix = CraftChatMessage.fromString(prefix)[0];
++            this.playerSuffix = CraftChatMessage.fromString(suffix)[0];
++            this.nametagVisibility = nametagVisibility;
++            this.collisionRule = collisionRule;
++            this.color = color;
++            this.options = options;
++        }
++
++        public Parameters(Component displayName, Component prefix, Component suffix, String nametagVisibility, String collisionRule, ChatFormatting color, int options) {
++            this.displayName = displayName;
++            this.playerPrefix = prefix;
++            this.playerSuffix = suffix;
++            this.nametagVisibility = nametagVisibility;
++            this.collisionRule = collisionRule;
++            this.color = color;
++            this.options = options;
++        }
++
+         public Parameters(PlayerTeam team) {
+             this.displayName = team.getDisplayName();
+             this.options = team.packOptions();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundTeleportEntityPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundTeleportEntityPacket.java
+index d5f404fb6dc09c48d84b4a3e75c12f2fbb53c224..51d0bb0d5d664b4326d3a3eabf1078a326b72fbd 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundTeleportEntityPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundTeleportEntityPacket.java
+@@ -4,6 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.phys.Vec3;
++import org.bukkit.Location;
+ 
+ public class ClientboundTeleportEntityPacket implements Packet<ClientGamePacketListener> {
+     private final int id;
+@@ -20,11 +21,28 @@ public class ClientboundTeleportEntityPacket implements Packet<ClientGamePacketL
+         this.x = vec3.x;
+         this.y = vec3.y;
+         this.z = vec3.z;
+-        this.yRot = (byte)((int)(entity.getYRot() * 256.0F / 360.0F));
+-        this.xRot = (byte)((int)(entity.getXRot() * 256.0F / 360.0F));
++        this.yRot = (byte) ((int) (entity.getYRot() * 256.0F / 360.0F));
++        this.xRot = (byte) ((int) (entity.getXRot() * 256.0F / 360.0F));
+         this.onGround = entity.onGround();
+     }
+ 
++    public ClientboundTeleportEntityPacket(int entityId, Vec3 vec3, byte yRot, byte xRot, boolean onGround) {
++        this.id = entityId;
++        this.x = vec3.x;
++        this.y = vec3.y;
++        this.z = vec3.z;
++        this.yRot = yRot;
++        this.xRot = xRot;
++        this.onGround = onGround;
++    }
++
++    public ClientboundTeleportEntityPacket(int entityId, Location location) {
++        this(entityId, Vec3.ZERO,
++            (byte) (location.getYaw() * 256.0F / 360.0F),
++            (byte) (location.getYaw() * 256.0F / 360.0F),
++            false);
++    }
++
+     public ClientboundTeleportEntityPacket(FriendlyByteBuf buf) {
+         this.id = buf.readVarInt();
+         this.x = buf.readDouble();
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 64aaea2b8c27c2b320f423b37dc0254bfe2fe015..8a20c3bf5907f45d738fe845f8c56a56888c5359 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableSet;
+ import com.google.common.io.BaseEncoding;
+ import com.mojang.authlib.GameProfile;
+ import com.mojang.datafixers.util.Pair;
+-import io.netty.buffer.Unpooled;
+ import it.unimi.dsi.fastutil.shorts.ShortArraySet;
+ import it.unimi.dsi.fastutil.shorts.ShortSet;
+ import java.io.ByteArrayOutputStream;
+@@ -32,11 +31,11 @@ import java.util.WeakHashMap;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+ import javax.annotation.Nullable;
++import net.md_5.bungee.api.chat.BaseComponent;
+ import net.minecraft.advancements.AdvancementProgress;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Holder;
+ import net.minecraft.core.SectionPos;
+-import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.chat.Component;
+@@ -138,7 +137,6 @@ import org.bukkit.craftbukkit.advancement.CraftAdvancement;
+ import org.bukkit.craftbukkit.advancement.CraftAdvancementProgress;
+ import org.bukkit.craftbukkit.block.CraftBlockEntityState;
+ import org.bukkit.craftbukkit.block.CraftBlockState;
+-import org.bukkit.craftbukkit.block.CraftBlockStates;
+ import org.bukkit.craftbukkit.block.CraftSign;
+ import org.bukkit.craftbukkit.block.data.CraftBlockData;
+ import org.bukkit.craftbukkit.conversations.ConversationTracker;
+@@ -146,7 +144,6 @@ import org.bukkit.craftbukkit.event.CraftEventFactory;
+ import org.bukkit.craftbukkit.inventory.CraftItemStack;
+ import org.bukkit.craftbukkit.map.CraftMapView;
+ import org.bukkit.craftbukkit.map.RenderData;
+-import org.bukkit.craftbukkit.profile.CraftPlayerProfile;
+ import org.bukkit.craftbukkit.scoreboard.CraftScoreboard;
+ import org.bukkit.craftbukkit.util.CraftChatMessage;
+ import org.bukkit.craftbukkit.util.CraftLocation;
+@@ -159,7 +156,6 @@ import org.bukkit.event.player.PlayerExpCooldownChangeEvent;
+ import org.bukkit.event.player.PlayerHideEntityEvent;
+ import org.bukkit.event.player.PlayerRegisterChannelEvent;
+ import org.bukkit.event.player.PlayerShowEntityEvent;
+-import org.bukkit.event.player.PlayerSpawnChangeEvent;
+ import org.bukkit.event.player.PlayerTeleportEvent;
+ import org.bukkit.event.player.PlayerUnregisterChannelEvent;
+ import org.bukkit.inventory.EquipmentSlot;
+@@ -170,12 +166,9 @@ import org.bukkit.map.MapView;
+ import org.bukkit.metadata.MetadataValue;
+ import org.bukkit.plugin.Plugin;
+ import org.bukkit.plugin.messaging.StandardMessenger;
+-import org.bukkit.profile.PlayerProfile;
+ import org.bukkit.scoreboard.Scoreboard;
+ import org.jetbrains.annotations.NotNull;
+ 
+-import net.md_5.bungee.api.chat.BaseComponent; // Spigot
+-
+ @DelegateDeserialization(CraftOfflinePlayer.class)
+ public class CraftPlayer extends CraftHumanEntity implements Player {
+     private long firstPlayed = 0;
+@@ -205,6 +198,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         this.firstPlayed = System.currentTimeMillis();
+     }
+ 
++    @Override
++    public void sendPacket(@NotNull Object obj) {
++        if (obj instanceof Packet<?> packet)
++            getHandle().connection.send(packet);
++    }
++
+     // Paper start - implement view distances
+     @Override
+     public int getViewDistance() {
+@@ -386,27 +385,27 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     @Override
+     public void setPlayerListHeaderFooter(BaseComponent[] header, BaseComponent[] footer) {
+-         if (header != null) {
+-             String headerJson = net.md_5.bungee.chat.ComponentSerializer.toString(header);
+-             playerListHeader = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(headerJson);
+-         } else {
+-             playerListHeader = null;
+-         }
++        if (header != null) {
++            String headerJson = net.md_5.bungee.chat.ComponentSerializer.toString(header);
++            playerListHeader = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(headerJson);
++        } else {
++            playerListHeader = null;
++        }
+ 
+         if (footer != null) {
+-             String footerJson = net.md_5.bungee.chat.ComponentSerializer.toString(footer);
+-             playerListFooter = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(footerJson);
++            String footerJson = net.md_5.bungee.chat.ComponentSerializer.toString(footer);
++            playerListFooter = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(footerJson);
+         } else {
+-             playerListFooter = null;
+-         }
++            playerListFooter = null;
++        }
+ 
+-         updatePlayerListHeaderFooter();
++        updatePlayerListHeaderFooter();
+     }
+ 
+     @Override
+     public void setPlayerListHeaderFooter(BaseComponent header, BaseComponent footer) {
+         this.setPlayerListHeaderFooter(header == null ? null : new BaseComponent[]{header},
+-                footer == null ? null : new BaseComponent[]{footer});
++            footer == null ? null : new BaseComponent[]{footer});
+     }
+ 
+ 
+@@ -479,7 +478,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     @Override
+     public String getDisplayName() {
+-        if(true) return io.papermc.paper.adventure.DisplayNames.getLegacy(this); // Paper
++        if (true) return io.papermc.paper.adventure.DisplayNames.getLegacy(this); // Paper
+         return this.getHandle().displayName;
+     }
+ 
+@@ -499,18 +498,22 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             }
+         }
+     }
++
+     @Override
+     public net.kyori.adventure.text.Component playerListName() {
+         return getHandle().listName == null ? net.kyori.adventure.text.Component.text(getName()) : io.papermc.paper.adventure.PaperAdventure.asAdventure(getHandle().listName);
+     }
++
+     @Override
+     public net.kyori.adventure.text.Component playerListHeader() {
+         return playerListHeader;
+     }
++
+     @Override
+     public net.kyori.adventure.text.Component playerListFooter() {
+         return playerListFooter;
+     }
++
+     // Paper end
+     @Override
+     public String getPlayerListName() {
+@@ -522,6 +525,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         // Purpur start
+         setPlayerListName(name, false);
+     }
++
+     public void setPlayerListName(String name, boolean useMM) {
+         // Purpur end
+         if (name == null) {
+@@ -604,6 +608,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     // Paper start
+     private static final net.kyori.adventure.text.Component DEFAULT_KICK_COMPONENT = net.kyori.adventure.text.Component.translatable("multiplayer.disconnect.kicked");
++
+     @Override
+     public void kick() {
+         this.kick(DEFAULT_KICK_COMPONENT);
+@@ -788,14 +793,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     @Override
+     public void playSound(org.bukkit.entity.Entity entity, Sound sound, org.bukkit.SoundCategory category, float volume, float pitch) {
+-        if (!(entity instanceof CraftEntity craftEntity) || sound == null || category == null || this.getHandle().connection == null) return;
++        if (!(entity instanceof CraftEntity craftEntity) || sound == null || category == null || this.getHandle().connection == null)
++            return;
+ 
+         this.playSound0(entity, CraftSound.bukkitToMinecraftHolder(sound), net.minecraft.sounds.SoundSource.valueOf(category.name()), volume, pitch);
+     }
+ 
+     @Override
+     public void playSound(org.bukkit.entity.Entity entity, String sound, org.bukkit.SoundCategory category, float volume, float pitch) {
+-        if (!(entity instanceof CraftEntity craftEntity) || sound == null || category == null || this.getHandle().connection == null) return;
++        if (!(entity instanceof CraftEntity craftEntity) || sound == null || category == null || this.getHandle().connection == null)
++            return;
+ 
+         this.playSound0(entity, Holder.direct(SoundEvent.createVariableRangeEvent(new ResourceLocation(sound))), net.minecraft.sounds.SoundSource.valueOf(category.name()), volume, pitch);
+     }
+@@ -961,7 +968,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         this.sendBlockChanges(blocks);
+     }
+ 
+-    private record ChunkSectionChanges(ShortSet positions, List<net.minecraft.world.level.block.state.BlockState> blockData) {
++    private record ChunkSectionChanges(ShortSet positions,
++                                       List<net.minecraft.world.level.block.state.BlockState> blockData) {
+ 
+         public ChunkSectionChanges() {
+             this(new ShortArraySet(), new ArrayList<>());
+@@ -1012,6 +1020,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         Component[] components = CraftSign.sanitizeLines(lines);
+         this.sendSignChange0(components, loc, dyeColor, hasGlowingText);
+     }
++
+     // Paper end
+     @Override
+     public void sendSignChange(Location loc, String[] lines) {
+@@ -1155,10 +1164,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             }
+ 
+             @Override
+-            public void onBorderSetDamagePerBlock(net.minecraft.world.level.border.WorldBorder border, double damagePerBlock) {} // NO OP
++            public void onBorderSetDamagePerBlock(net.minecraft.world.level.border.WorldBorder border, double damagePerBlock) {
++            } // NO OP
+ 
+             @Override
+-            public void onBorderSetDamageSafeZOne(net.minecraft.world.level.border.WorldBorder border, double safeZoneRadius) {} // NO OP
++            public void onBorderSetDamageSafeZOne(net.minecraft.world.level.border.WorldBorder border, double safeZoneRadius) {
++            } // NO OP
+         };
+     }
+ 
+@@ -1343,7 +1354,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         }
+ 
+         if (entity.connection == null) {
+-           return false;
++            return false;
+         }
+ 
+         if (entity.isVehicle() && !ignorePassengers) { // Paper - Teleport API
+@@ -1886,6 +1897,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         server.getPluginManager().callEvent(new PlayerHideEntityEvent(this, entity));
+     }
++
+     private void unregisterEntity(Entity other) {
+         // Paper end
+         ChunkMap tracker = ((ServerLevel) this.getHandle().level()).getChunkSource().chunkMap;
+@@ -1968,6 +1980,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         // Paper start - uuid override
+         this.trackAndShowEntity(entity, null);
+     }
++
+     private void trackAndShowEntity(org.bukkit.entity.Entity entity, final @Nullable UUID uuidOverride) {
+         // Paper end
+         ChunkMap tracker = ((ServerLevel) this.getHandle().level()).getChunkSource().chunkMap;
+@@ -1993,6 +2006,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         this.server.getPluginManager().callEvent(new PlayerShowEntityEvent(this, entity));
+     }
++
+     // Paper start
+     @Override
+     public void setPlayerProfile(com.destroystokyo.paper.profile.PlayerProfile profile) {
+@@ -2037,6 +2051,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             this.trackAndShowEntity(entity);
+         }
+     }
++
+     // Paper start
+     public com.destroystokyo.paper.profile.PlayerProfile getPlayerProfile() {
+         return new com.destroystokyo.paper.profile.CraftPlayerProfile(this).clone();
+@@ -2599,7 +2614,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     }
+ 
+     public void setRealHealth(double health) {
+-        if (Double.isNaN(health)) {return;} // Paper
++        if (Double.isNaN(health)) {
++            return;
++        } // Paper
+         this.health = health;
+     }
+ 
+@@ -2653,13 +2670,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+                 break;
+             }
+         }
+-        AttributeInstance dummy = new AttributeInstance(Attributes.MAX_HEALTH, (attribute) -> { });
++        AttributeInstance dummy = new AttributeInstance(Attributes.MAX_HEALTH, (attribute) -> {
++        });
+         // Spigot start
+         double healthMod = this.scaledHealth ? this.healthScale : this.getMaxHealth();
+-        if ( healthMod >= Float.MAX_VALUE || healthMod <= 0 )
+-        {
++        if (healthMod >= Float.MAX_VALUE || healthMod <= 0) {
+             healthMod = 20; // Reset health
+-            this.getServer().getLogger().warning( this.getName() + " tried to crash the server with a large health attribute" );
++            this.getServer().getLogger().warning(this.getName() + " tried to crash the server with a large health attribute");
+         }
+         dummy.setBaseValue(healthMod);
+         // Spigot end
+@@ -2793,6 +2810,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     public java.util.Locale locale() {
+         return getHandle().adventure$locale;
+     }
++
+     // Paper end
+     @Override
+     public int getPing() {
+@@ -2832,8 +2850,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");
+         Preconditions.checkArgument(hash != null, "Hash cannot be null");
+         net.minecraft.network.chat.Component promptComponent = resourcePackPrompt != null ?
+-                            io.papermc.paper.adventure.PaperAdventure.asVanilla(resourcePackPrompt) :
+-                           null;
++            io.papermc.paper.adventure.PaperAdventure.asVanilla(resourcePackPrompt) :
++            null;
+         this.getHandle().connection.send(new ClientboundResourcePackPacket(url, hash, required, promptComponent));
+     }
+ 
+@@ -3166,49 +3184,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             super.remove();
+         }
+     }
++
+     // Paper end
+     // Spigot start
+-    private final Player.Spigot spigot = new Player.Spigot()
+-    {
++    private final Player.Spigot spigot = new Player.Spigot() {
+ 
+         @Override
+-        public InetSocketAddress getRawAddress()
+-        {
++        public InetSocketAddress getRawAddress() {
+             return (InetSocketAddress) CraftPlayer.this.getHandle().connection.getRawAddress();
+         }
+ 
+         @Override
+-        public void respawn()
+-        {
+-            if ( CraftPlayer.this.getHealth() <= 0 && CraftPlayer.this.isOnline() )
+-            {
+-                CraftPlayer.this.server.getServer().getPlayerList().respawn( CraftPlayer.this.getHandle(), false, org.bukkit.event.player.PlayerRespawnEvent.RespawnReason.PLUGIN );
++        public void respawn() {
++            if (CraftPlayer.this.getHealth() <= 0 && CraftPlayer.this.isOnline()) {
++                CraftPlayer.this.server.getServer().getPlayerList().respawn(CraftPlayer.this.getHandle(), false, org.bukkit.event.player.PlayerRespawnEvent.RespawnReason.PLUGIN);
+             }
+         }
+ 
+         @Override
+-        public Set<Player> getHiddenPlayers()
+-        {
++        public Set<Player> getHiddenPlayers() {
+             Set<Player> ret = new HashSet<>();
+-            for ( Player p : CraftPlayer.this.getServer().getOnlinePlayers() )
+-            {
+-                if ( !CraftPlayer.this.canSee(p) )
+-                {
+-                    ret.add( p );
++            for (Player p : CraftPlayer.this.getServer().getOnlinePlayers()) {
++                if (!CraftPlayer.this.canSee(p)) {
++                    ret.add(p);
+                 }
+             }
+ 
+-            return java.util.Collections.unmodifiableSet( ret );
++            return java.util.Collections.unmodifiableSet(ret);
+         }
+ 
+         @Override
+         public void sendMessage(BaseComponent component) {
+-          this.sendMessage( new BaseComponent[] { component } );
++            this.sendMessage(new BaseComponent[]{component});
+         }
+ 
+         @Override
+         public void sendMessage(BaseComponent... components) {
+-           this.sendMessage(net.md_5.bungee.api.ChatMessageType.SYSTEM, components);
++            this.sendMessage(net.md_5.bungee.api.ChatMessageType.SYSTEM, components);
+         }
+ 
+         @Override
+@@ -3223,7 +3235,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         @Override
+         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent component) {
+-            this.sendMessage( position, new BaseComponent[] { component } );
++            this.sendMessage(position, new BaseComponent[]{component});
+         }
+ 
+         @Override
+@@ -3233,20 +3245,19 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         @Override
+         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent component) {
+-            this.sendMessage( position, sender, new BaseComponent[] { component } );
++            this.sendMessage(position, sender, new BaseComponent[]{component});
+         }
+ 
+         @Override
+         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent... components) {
+-            if ( CraftPlayer.this.getHandle().connection == null ) return;
++            if (CraftPlayer.this.getHandle().connection == null) return;
+ 
+             CraftPlayer.this.getHandle().connection.send(new net.minecraft.network.protocol.game.ClientboundSystemChatPacket(components, position == net.md_5.bungee.api.ChatMessageType.ACTION_BAR));
+         }
+ 
+         // Paper start
+         @Override
+-        public int getPing()
+-        {
++        public int getPing() {
+             return CraftPlayer.this.getPing();
+         }
+         // Paper end
+@@ -3262,7 +3273,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     // Paper start
+     @Override
+     public void showElderGuardian(boolean silent) {
+-        if (getHandle().connection != null) getHandle().connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.GUARDIAN_ELDER_EFFECT, silent ? 0F : 1F));
++        if (getHandle().connection != null)
++            getHandle().connection.send(new ClientboundGameEventPacket(ClientboundGameEventPacket.GUARDIAN_ELDER_EFFECT, silent ? 0F : 1F));
+     }
+ 
+     @Override
+@@ -3313,8 +3325,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     }
+     // Paper end
+ 
+-    public Player.Spigot spigot()
+-    {
++    public Player.Spigot spigot() {
+         return this.spigot;
+     }
+     // Spigot end
+@@ -3368,7 +3379,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     @Override
+     public void sendBlockHighlight(Location location, int duration, String text, org.bukkit.Color color, int transparency) {
+-        if (transparency < 0 || transparency > 255) throw new IllegalArgumentException("transparency is outside of 0-255 range");
++        if (transparency < 0 || transparency > 255)
++            throw new IllegalArgumentException("transparency is outside of 0-255 range");
+         sendBlockHighlight(location, duration, text, transparency << 24 | color.asRGB());
+     }
+ 

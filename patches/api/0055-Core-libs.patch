@@ -1,0 +1,780 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Fri, 24 Nov 2023 20:13:36 +0200
+Subject: [PATCH] Core libs
+
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index f22c0403729b3554ff769b06f7455516b15fd974..c3091e0ce5e28142bb84f7e574a801a29890c1d4 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -26,6 +26,8 @@ configurations.api {
+ }
+ 
+ dependencies {
++    implementation("ru.minecomplex.core:libs:DEV") // Vortex
++
+     // api dependencies are listed transitively to API consumers
+     api("com.google.guava:guava:32.1.2-jre")
+     api("com.google.code.gson:gson:2.10.1")
+diff --git a/src/main/java/org/bukkit/Location.java b/src/main/java/org/bukkit/Location.java
+index 13f221dd4e332db01195eb0c92ef9f26a17eb6d6..ed3be01cd9bfa1785e3f3be8bd2d70a293e86512 100644
+--- a/src/main/java/org/bukkit/Location.java
++++ b/src/main/java/org/bukkit/Location.java
+@@ -3,23 +3,22 @@ package org.bukkit;
+ import com.google.common.base.Preconditions;
+ import java.lang.ref.Reference;
+ import java.lang.ref.WeakReference;
+-import com.google.common.base.Preconditions; // Paper
++import java.util.Collection;
+ import java.util.HashMap;
+ import java.util.Map;
++import java.util.function.Predicate;
++import org.bson.codecs.pojo.annotations.BsonCreator;
++import org.bson.codecs.pojo.annotations.BsonIgnore;
++import org.bson.codecs.pojo.annotations.BsonProperty;
+ import org.bukkit.block.Block;
+ import org.bukkit.configuration.serialization.ConfigurationSerializable;
+-import org.bukkit.entity.Entity; // Paper
++import org.bukkit.entity.Entity;
++import org.bukkit.entity.LivingEntity;
++import org.bukkit.entity.Player;
+ import org.bukkit.util.NumberConversions;
+ import org.bukkit.util.Vector;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+-
+-// Paper start
+-import java.util.Collection;
+-import java.util.function.Predicate;
+-import org.bukkit.entity.Entity;
+-import org.bukkit.entity.LivingEntity;
+-import org.bukkit.entity.Player;
+ // Paper end
+ 
+ /**
+@@ -31,7 +30,9 @@ import org.bukkit.entity.Player;
+  * representation by the implementation.
+  */
+ public class Location implements Cloneable, ConfigurationSerializable, io.papermc.paper.math.FinePosition { // Paper
++    @BsonIgnore
+     private Reference<World> world;
++    private String worldName;
+     private double x;
+     private double y;
+     private double z;
+@@ -42,9 +43,9 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * Constructs a new Location with the given coordinates
+      *
+      * @param world The world in which this location resides
+-     * @param x The x-coordinate of this new location
+-     * @param y The y-coordinate of this new location
+-     * @param z The z-coordinate of this new location
++     * @param x     The x-coordinate of this new location
++     * @param y     The y-coordinate of this new location
++     * @param z     The z-coordinate of this new location
+      */
+     public Location(@UndefinedNullability final World world, final double x, final double y, final double z) { // Paper
+         this(world, x, y, z, 0, 0);
+@@ -54,10 +55,10 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * Constructs a new Location with the given coordinates and direction
+      *
+      * @param world The world in which this location resides
+-     * @param x The x-coordinate of this new location
+-     * @param y The y-coordinate of this new location
+-     * @param z The z-coordinate of this new location
+-     * @param yaw The absolute rotation on the x-plane, in degrees
++     * @param x     The x-coordinate of this new location
++     * @param y     The y-coordinate of this new location
++     * @param z     The z-coordinate of this new location
++     * @param yaw   The absolute rotation on the x-plane, in degrees
+      * @param pitch The absolute rotation on the y-plane, in degrees
+      */
+     public Location(@UndefinedNullability final World world, final double x, final double y, final double z, final float yaw, final float pitch) { // Paper
+@@ -72,6 +73,32 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+         this.yaw = yaw;
+     }
+ 
++    /**
++     * Constructs a new Location with the given coordinates and direction
++     *
++     * @param worldName The world in which this location resides
++     * @param x         The x-coordinate of this new location
++     * @param y         The y-coordinate of this new location
++     * @param z         The z-coordinate of this new location
++     * @param yaw       The absolute rotation on the x-plane, in degrees
++     * @param pitch     The absolute rotation on the y-plane, in degrees
++     */
++    @BsonCreator
++    public Location(@UndefinedNullability @BsonProperty("worldName") final String worldName,
++                    @BsonProperty("x") final double x,
++                    @BsonProperty("y") final double y,
++                    @BsonProperty("z") final double z,
++                    @BsonProperty("yaw") final float yaw,
++                    @BsonProperty("pitch") final float pitch) { // Paper
++        this.worldName = worldName;
++        this.x = x;
++        this.y = y;
++        this.z = z;
++        this.pitch = pitch;
++        this.yaw = yaw;
++        setWorld(findWorld());
++    }
++
+     /**
+      * Sets the world that this location resides in
+      *
+@@ -79,6 +106,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      */
+     public void setWorld(@Nullable World world) {
+         this.world = (world == null) ? null : new WeakReference<>(world);
++        this.worldName = (world == null) ? null : world.getName();
+     }
+ 
+     /**
+@@ -86,12 +114,9 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      *
+      * @return true if is loaded, otherwise false
+      */
++    @BsonIgnore
+     public boolean isWorldLoaded() {
+-        if (this.world == null) {
+-            return false;
+-        }
+-
+-        World world = this.world.get();
++        World world = findWorld();
+         return world != null && Bukkit.getWorld(world.getUID()) != null;
+     }
+ 
+@@ -102,23 +127,32 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * @throws IllegalArgumentException when world is unloaded
+      * @see #isWorldLoaded()
+      */
++    @BsonIgnore
+     @UndefinedNullability // Paper
+     public World getWorld() {
+-        if (this.world == null) {
+-            return null;
+-        }
+-
+-        World world = this.world.get();
++        World world = findWorld();
+         Preconditions.checkArgument(world != null, "World unloaded");
+         return world;
+     }
+ 
++    @BsonIgnore
++    private World findWorld() {
++        World world = null;
++        if (this.world != null) {
++            world = this.world.get();
++        } else if (worldName != null) {
++            world = Bukkit.getWorld(worldName);
++        }
++        return world;
++    }
++
+     /**
+      * Gets the chunk at the represented location
+      *
+      * @return Chunk at the represented location
+      */
+     @NotNull
++    @BsonIgnore
+     public Chunk getChunk() {
+         return getWorld().getChunkAt(this);
+     }
+@@ -129,6 +163,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * @return Block at the represented location
+      */
+     @NotNull
++    @BsonIgnore
+     public Block getBlock() {
+         return getWorld().getBlockAt(this);
+     }
+@@ -157,6 +192,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      *
+      * @return block X
+      */
++    @BsonIgnore
+     public int getBlockX() {
+         return locToBlock(x);
+     }
+@@ -185,6 +221,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      *
+      * @return block y
+      */
++    @BsonIgnore
+     public int getBlockY() {
+         return locToBlock(y);
+     }
+@@ -213,6 +250,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      *
+      * @return block z
+      */
++    @BsonIgnore
+     public int getBlockZ() {
+         return locToBlock(z);
+     }
+@@ -290,9 +328,10 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * facing.
+      *
+      * @return a vector pointing the direction of this location's {@link
+-     *     #getPitch() pitch} and {@link #getYaw() yaw}
++     * #getPitch() pitch} and {@link #getYaw() yaw}
+      */
+     @NotNull
++    @BsonIgnore
+     public Vector getDirection() {
+         Vector vector = new Vector();
+ 
+@@ -462,6 +501,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * @return the magnitude
+      * @see Vector
+      */
++    @BsonIgnore
+     public double length() {
+         return Math.sqrt(NumberConversions.square(x) + NumberConversions.square(y) + NumberConversions.square(z));
+     }
+@@ -473,6 +513,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * @return the magnitude
+      * @see Vector
+      */
++    @BsonIgnore
+     public double lengthSquared() {
+         return NumberConversions.square(x) + NumberConversions.square(y) + NumberConversions.square(z);
+     }
+@@ -536,6 +577,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * @see Vector
+      */
+     @NotNull
++    @BsonIgnore
+     public Location zero() {
+         x = 0;
+         y = 0;
+@@ -543,14 +585,19 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+         return this;
+     }
+ 
+-    public boolean isChunkLoaded() { return this.getWorld().isChunkLoaded(locToBlock(x) >> 4, locToBlock(z) >> 4); } // Paper
++    @BsonIgnore
++    public boolean isChunkLoaded() {
++        return this.getWorld().isChunkLoaded(locToBlock(x) >> 4, locToBlock(z) >> 4);
++    } // Paper
+ 
+     // Paper start
++
+     /**
+      * Checks if a {@link Chunk} has been generated at this location.
+      *
+      * @return true if a chunk has been generated at this location
+      */
++    @BsonIgnore
+     public boolean isGenerated() {
+         World world = this.getWorld();
+         Preconditions.checkNotNull(world, "Location has no world!");
+@@ -559,8 +606,9 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Sets the position of this Location and returns itself
+-     *
++     * <p>
+      * This mutates this object, clone first.
++     *
+      * @param x X coordinate
+      * @param y Y coordinate
+      * @param z Z coordinate
+@@ -576,12 +624,13 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Takes the x/y/z from base and adds the specified x/y/z to it and returns self
+-     *
++     * <p>
+      * This mutates this object, clone first.
++     *
+      * @param base The base coordinate to modify
+-     * @param x X coordinate to add to base
+-     * @param y Y coordinate to add to base
+-     * @param z Z coordinate to add to base
++     * @param x    X coordinate to add to base
++     * @param y    Y coordinate to add to base
++     * @param z    Z coordinate to add to base
+      * @return self (not cloned)
+      */
+     @NotNull
+@@ -591,12 +640,13 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Takes the x/y/z from base and subtracts the specified x/y/z to it and returns self
+-     *
++     * <p>
+      * This mutates this object, clone first.
++     *
+      * @param base The base coordinate to modify
+-     * @param x X coordinate to subtract from base
+-     * @param y Y coordinate to subtract from base
+-     * @param z Z coordinate to subtract from base
++     * @param x    X coordinate to subtract from base
++     * @param y    Y coordinate to subtract from base
++     * @param z    Z coordinate to subtract from base
+      * @return self (not cloned)
+      */
+     @NotNull
+@@ -608,6 +658,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * @return A new location where X/Y/Z are on the Block location (integer value of X/Y/Z)
+      */
+     @NotNull
++    @BsonIgnore
+     public Location toBlockLocation() {
+         Location blockLoc = clone();
+         blockLoc.setX(getBlockX());
+@@ -617,12 +668,14 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+     }
+ 
+     // Paper Start
++
+     /**
+      * @return The block key for this location's block location.
+      * @see Block#getBlockKey(int, int, int)
+      * @deprecated only encodes y block ranges from -512 to 511 and represents an already changed implementation detail
+      */
+     @Deprecated
++    @BsonIgnore
+     public long toBlockKey() {
+         return Block.getBlockKey(getBlockX(), getBlockY(), getBlockZ());
+     }
+@@ -632,6 +685,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * @return A new location where X/Y/Z are the center of the block
+      */
+     @NotNull
++    @BsonIgnore
+     public Location toCenterLocation() {
+         Location centerLoc = clone();
+         centerLoc.setX(getBlockX() + 0.5);
+@@ -641,26 +695,31 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+     }
+ 
+     // Paper start - Add heightmap api
++
+     /**
+      * Returns a copy of this location except with y = getWorld().getHighestBlockYAt(this.getBlockX(), this.getBlockZ())
++     *
+      * @return A copy of this location except with y = getWorld().getHighestBlockYAt(this.getBlockX(), this.getBlockZ())
+      * @throws NullPointerException if {{@link #getWorld()}} is {@code null}
+      */
+     @NotNull
++    @BsonIgnore
+     public Location toHighestLocation() {
+         return this.toHighestLocation(HeightMap.WORLD_SURFACE);
+     }
+ 
+     /**
+      * Returns a copy of this location except with y = getWorld().getHighestBlockYAt(this.getBlockX(), this.getBlockZ(), heightmap)
++     *
+      * @param heightmap The heightmap to use for finding the highest y location.
+      * @return A copy of this location except with y = getWorld().getHighestBlockYAt(this.getBlockX(), this.getBlockZ(), heightmap)
+-     * @throws NullPointerException if {{@link #getWorld()}} is {@code null}
++     * @throws NullPointerException          if {{@link #getWorld()}} is {@code null}
+      * @throws UnsupportedOperationException if {@link World#getHighestBlockYAt(int, int, com.destroystokyo.paper.HeightmapType)} does not support the specified heightmap
+      * @deprecated Use {@link org.bukkit.Location#toHighestLocation(HeightMap)}
+      */
+     @NotNull
+-    @Deprecated(forRemoval = true) @org.jetbrains.annotations.ApiStatus.ScheduledForRemoval(inVersion = "1.21")
++    @Deprecated(forRemoval = true)
++    @org.jetbrains.annotations.ApiStatus.ScheduledForRemoval(inVersion = "1.21")
+     public Location toHighestLocation(@NotNull final com.destroystokyo.paper.HeightmapType heightmap) {
+         final Location ret = this.clone();
+         ret.setY(this.getWorld().getHighestBlockYAt(this, heightmap));
+@@ -669,6 +728,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Returns a copy of this location except with y = getWorld().getHighestBlockYAt(this.getBlockX(), this.getBlockZ(), heightMap)
++     *
+      * @param heightMap The heightmap to use for finding the highest y location.
+      * @return A copy of this location except with y = getWorld().getHighestBlockYAt(this.getBlockX(), this.getBlockZ(), heightMap)
+      */
+@@ -681,9 +741,10 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+     // Paper end - Add heightmap api
+ 
+     // Paper start - Expand Explosions API
++
+     /**
+      * Creates explosion at this location with given power
+-     *
++     * <p>
+      * Will break blocks and ignite blocks on fire.
+      *
+      * @param power The power of explosion, where 4F is TNT
+@@ -696,10 +757,10 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+     /**
+      * Creates explosion at this location with given power and optionally
+      * setting blocks on fire.
+-     *
++     * <p>
+      * Will break blocks.
+      *
+-     * @param power The power of explosion, where 4F is TNT
++     * @param power   The power of explosion, where 4F is TNT
+      * @param setFire Whether or not to set blocks on fire
+      * @return false if explosion was canceled, otherwise true
+      */
+@@ -711,8 +772,8 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * Creates explosion at this location with given power and optionally
+      * setting blocks on fire.
+      *
+-     * @param power The power of explosion, where 4F is TNT
+-     * @param setFire Whether or not to set blocks on fire
++     * @param power       The power of explosion, where 4F is TNT
++     * @param setFire     Whether or not to set blocks on fire
+      * @param breakBlocks Whether or not to have blocks be destroyed
+      * @return false if explosion was canceled, otherwise true
+      */
+@@ -722,11 +783,11 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Creates explosion at this location with given power, with the specified entity as the source.
+-     *
++     * <p>
+      * Will break blocks and ignite blocks on fire.
+      *
+      * @param source The source entity of the explosion
+-     * @param power The power of explosion, where 4F is TNT
++     * @param power  The power of explosion, where 4F is TNT
+      * @return false if explosion was canceled, otherwise true
+      */
+     public boolean createExplosion(@Nullable Entity source, float power) {
+@@ -736,11 +797,11 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+     /**
+      * Creates explosion at this location with given power and optionally
+      * setting blocks on fire, with the specified entity as the source.
+-     *
++     * <p>
+      * Will break blocks.
+      *
+-     * @param source The source entity of the explosion
+-     * @param power The power of explosion, where 4F is TNT
++     * @param source  The source entity of the explosion
++     * @param power   The power of explosion, where 4F is TNT
+      * @param setFire Whether or not to set blocks on fire
+      * @return false if explosion was canceled, otherwise true
+      */
+@@ -752,9 +813,9 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * Creates explosion at this location with given power and optionally
+      * setting blocks on fire, with the specified entity as the source.
+      *
+-     * @param source The source entity of the explosion
+-     * @param power The power of explosion, where 4F is TNT
+-     * @param setFire Whether or not to set blocks on fire
++     * @param source      The source entity of the explosion
++     * @param power       The power of explosion, where 4F is TNT
++     * @param setFire     Whether or not to set blocks on fire
+      * @param breakBlocks Whether or not to have blocks be destroyed
+      * @return false if explosion was canceled, otherwise true
+      */
+@@ -765,7 +826,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Returns a list of entities within a bounding box centered around a Location.
+-     *
++     * <p>
+      * Some implementations may impose artificial restrictions on the size of the search bounding box.
+      *
+      * @param x 1/2 the size of the box along x axis
+@@ -784,6 +845,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
++     *
+      * @param radius X Radius
+      * @return the collection of entities near location. This will always be a non-null collection.
+      */
+@@ -794,8 +856,9 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
++     *
+      * @param xzRadius X/Z Radius
+-     * @param yRadius Y Radius
++     * @param yRadius  Y Radius
+      * @return the collection of living entities near location. This will always be a non-null collection.
+      */
+     @NotNull
+@@ -805,6 +868,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
++     *
+      * @param xRadius X Radius
+      * @param yRadius Y Radius
+      * @param zRadius Z radius
+@@ -817,7 +881,8 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
+-     * @param radius Radius
++     *
++     * @param radius    Radius
+      * @param predicate a predicate used to filter results
+      * @return the collection of living entities near location. This will always be a non-null collection.
+      */
+@@ -828,8 +893,9 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
+-     * @param xzRadius X/Z Radius
+-     * @param yRadius Y Radius
++     *
++     * @param xzRadius  X/Z Radius
++     * @param yRadius   Y Radius
+      * @param predicate a predicate used to filter results
+      * @return the collection of living entities near location. This will always be a non-null collection.
+      */
+@@ -840,9 +906,10 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
+-     * @param xRadius X Radius
+-     * @param yRadius Y Radius
+-     * @param zRadius Z radius
++     *
++     * @param xRadius   X Radius
++     * @param yRadius   Y Radius
++     * @param zRadius   Z radius
+      * @param predicate a predicate used to filter results
+      * @return the collection of living entities near location. This will always be a non-null collection.
+      */
+@@ -853,6 +920,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
++     *
+      * @param radius X/Y/Z Radius
+      * @return the collection of players near location. This will always be a non-null collection.
+      */
+@@ -863,8 +931,9 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
++     *
+      * @param xzRadius X/Z Radius
+-     * @param yRadius Y Radius
++     * @param yRadius  Y Radius
+      * @return the collection of players near location. This will always be a non-null collection.
+      */
+     @NotNull
+@@ -874,6 +943,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
++     *
+      * @param xRadius X Radius
+      * @param yRadius Y Radius
+      * @param zRadius Z Radius
+@@ -886,7 +956,8 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
+-     * @param radius X/Y/Z Radius
++     *
++     * @param radius    X/Y/Z Radius
+      * @param predicate a predicate used to filter results
+      * @return the collection of players near location. This will always be a non-null collection.
+      */
+@@ -897,8 +968,9 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
+-     * @param xzRadius X/Z Radius
+-     * @param yRadius Y Radius
++     *
++     * @param xzRadius  X/Z Radius
++     * @param yRadius   Y Radius
+      * @param predicate a predicate used to filter results
+      * @return the collection of players near location. This will always be a non-null collection.
+      */
+@@ -909,9 +981,10 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets nearby players within the specified radius (bounding box)
+-     * @param xRadius X Radius
+-     * @param yRadius Y Radius
+-     * @param zRadius Z Radius
++     *
++     * @param xRadius   X Radius
++     * @param yRadius   Y Radius
++     * @param zRadius   Z Radius
+      * @param predicate a predicate used to filter results
+      * @return the collection of players near location. This will always be a non-null collection.
+      */
+@@ -922,9 +995,10 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets all nearby entities of the specified type, within the specified radius (bounding box)
+-     * @param clazz Type to filter by
++     *
++     * @param clazz  Type to filter by
+      * @param radius X/Y/Z radius to search within
+-     * @param <T> the entity type
++     * @param <T>    the entity type
+      * @return the collection of entities of type clazz near location. This will always be a non-null collection.
+      */
+     @NotNull
+@@ -934,10 +1008,11 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets all nearby entities of the specified type, within the specified radius, with x and x radius matching (bounding box)
+-     * @param clazz Type to filter by
++     *
++     * @param clazz    Type to filter by
+      * @param xzRadius X/Z radius to search within
+-     * @param yRadius Y radius to search within
+-     * @param <T> the entity type
++     * @param yRadius  Y radius to search within
++     * @param <T>      the entity type
+      * @return the collection of entities near location. This will always be a non-null collection.
+      */
+     @NotNull
+@@ -947,11 +1022,12 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets all nearby entities of the specified type, within the specified radius (bounding box)
+-     * @param clazz Type to filter by
++     *
++     * @param clazz   Type to filter by
+      * @param xRadius X Radius
+      * @param yRadius Y Radius
+      * @param zRadius Z Radius
+-     * @param <T> the entity type
++     * @param <T>     the entity type
+      * @return the collection of entities near location. This will always be a non-null collection.
+      */
+     @NotNull
+@@ -961,10 +1037,11 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets all nearby entities of the specified type, within the specified radius (bounding box)
+-     * @param clazz Type to filter by
+-     * @param radius X/Y/Z radius to search within
++     *
++     * @param clazz     Type to filter by
++     * @param radius    X/Y/Z radius to search within
+      * @param predicate a predicate used to filter results
+-     * @param <T> the entity type
++     * @param <T>       the entity type
+      * @return the collection of entities near location. This will always be a non-null collection.
+      */
+     @NotNull
+@@ -974,11 +1051,12 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets all nearby entities of the specified type, within the specified radius, with x and x radius matching (bounding box)
+-     * @param clazz Type to filter by
+-     * @param xzRadius X/Z radius to search within
+-     * @param yRadius Y radius to search within
++     *
++     * @param clazz     Type to filter by
++     * @param xzRadius  X/Z radius to search within
++     * @param yRadius   Y radius to search within
+      * @param predicate a predicate used to filter results
+-     * @param <T> the entity type
++     * @param <T>       the entity type
+      * @return the collection of entities near location. This will always be a non-null collection.
+      */
+     @NotNull
+@@ -988,12 +1066,13 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     /**
+      * Gets all nearby entities of the specified type, within the specified radius (bounding box)
+-     * @param clazz Type to filter by
+-     * @param xRadius X Radius
+-     * @param yRadius Y Radius
+-     * @param zRadius Z Radius
++     *
++     * @param clazz     Type to filter by
++     * @param xRadius   X Radius
++     * @param yRadius   Y Radius
++     * @param zRadius   Z Radius
+      * @param predicate a predicate used to filter results
+-     * @param <T> the entity type
++     * @param <T>       the entity type
+      * @return the collection of entities near location. This will always be a non-null collection.
+      */
+     @NotNull
+@@ -1004,6 +1083,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+         }
+         return world.getNearbyEntitiesByType(clazz, this, xRadius, yRadius, zRadius, predicate);
+     }
++
+     // Paper end
+     @Override
+     public boolean equals(Object obj) {
+@@ -1039,6 +1119,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+     }
+ 
+     @Override
++    @BsonIgnore
+     public int hashCode() {
+         int hash = 3;
+ 
+@@ -1053,6 +1134,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+     }
+ 
+     @Override
++    @BsonIgnore
+     public String toString() {
+         World world = (this.world == null) ? null : this.world.get();
+         return "Location{" + "world=" + world + ",x=" + x + ",y=" + y + ",z=" + z + ",pitch=" + pitch + ",yaw=" + yaw + '}';
+@@ -1062,15 +1144,17 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+      * Constructs a new {@link Vector} based on this Location
+      *
+      * @return New Vector containing the coordinates represented by this
+-     *     Location
++     * Location
+      */
+     @NotNull
++    @BsonIgnore
+     public Vector toVector() {
+         return new Vector(x, y, z);
+     }
+ 
+     @Override
+     @NotNull
++    @BsonIgnore
+     public Location clone() {
+         try {
+             return (Location) super.clone();
+@@ -1106,6 +1190,7 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+     @Override
+     @Utility
+     @NotNull
++    @BsonIgnore
+     public Map<String, Object> serialize() {
+         Map<String, Object> data = new HashMap<String, Object>();
+ 
+@@ -1181,21 +1266,25 @@ public class Location implements Cloneable, ConfigurationSerializable, io.paperm
+ 
+     // Paper - add Position
+     @Override
++    @BsonIgnore
+     public double x() {
+         return this.getX();
+     }
+ 
+     @Override
++    @BsonIgnore
+     public double y() {
+         return this.getY();
+     }
+ 
+     @Override
++    @BsonIgnore
+     public double z() {
+         return this.getZ();
+     }
+ 
+     @Override
++    @BsonIgnore
+     public boolean isFinite() {
+         return io.papermc.paper.math.FinePosition.super.isFinite() && Float.isFinite(this.getYaw()) && Float.isFinite(this.getPitch());
+     }
