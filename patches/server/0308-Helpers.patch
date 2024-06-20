@@ -1,11 +1,11 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: xVorttex <sigamatute@gmail.com>
-Date: Sat, 25 Nov 2023 15:16:13 +0200
+Date: Fri, 19 Jan 2024 22:10:54 +0200
 Subject: [PATCH] Helpers
 
 
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
-index 0dd611aed9749ebed64e74fc4c2599c3c7f3ff2c..c73c324a9ef2f935e56d198b3b477b98a63a00c6 100644
+index 0dd611aed9749ebed64e74fc4c2599c3c7f3ff2c..6447ee94347513ece9e0a12e542f76e96bcb04db 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundAddEntityPacket.java
 @@ -9,6 +9,7 @@ import net.minecraft.util.Mth;
@@ -21,16 +21,16 @@ index 0dd611aed9749ebed64e74fc4c2599c3c7f3ff2c..c73c324a9ef2f935e56d198b3b477b98
  
      public ClientboundAddEntityPacket(Entity entity, int entityData) {
 -        this(entity.getId(), entity.getUUID(), entity.getX(), entity.getY(), entity.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), (double)entity.getYHeadRot());
-+        this(entity.getId(), entity.getUUID(), entity.getX(), entity.getY(), entity.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), (double) entity.getYHeadRot());
++        this(entity.getId(), entity.getUUID(), entity.getX(), entity.getY(), entity.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), entity.getYHeadRot());
      }
  
      public ClientboundAddEntityPacket(Entity entity, int entityData, BlockPos pos) {
 -        this(entity.getId(), entity.getUUID(), (double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), (double)entity.getYHeadRot());
-+        this(entity.getId(), entity.getUUID(), (double) pos.getX(), (double) pos.getY(), (double) pos.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), (double) entity.getYHeadRot());
++        this(entity.getId(), entity.getUUID(), pos.getX(), pos.getY(), pos.getZ(), entity.getXRot(), entity.getYRot(), entity.getType(), entityData, entity.getDeltaMovement(), entity.getYHeadRot());
      }
  
      public ClientboundAddEntityPacket(int id, UUID uuid, double x, double y, double z, float pitch, float yaw, EntityType<?> entityType, int entityData, Vec3 velocity, double headYaw) {
-@@ -45,16 +46,31 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+@@ -45,14 +46,28 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
          this.x = x;
          this.y = y;
          this.z = z;
@@ -48,27 +48,24 @@ index 0dd611aed9749ebed64e74fc4c2599c3c7f3ff2c..c73c324a9ef2f935e56d198b3b477b98
 +        this.xa = (int) (Mth.clamp(velocity.x, -3.9D, 3.9D) * 8000.0D);
 +        this.ya = (int) (Mth.clamp(velocity.y, -3.9D, 3.9D) * 8000.0D);
 +        this.za = (int) (Mth.clamp(velocity.z, -3.9D, 3.9D) * 8000.0D);
-     }
- 
++    }
++
 +    public ClientboundAddEntityPacket(int id, UUID uuid, Location location) {
 +        this(id, uuid,
 +            location.getX(),
 +            location.getY(),
 +            location.getZ(),
-+            location.getPitch(),
-+            location.getYaw(),
++            0.0F,
++            0.0F,
 +            EntityType.ARMOR_STAND,
 +            0,
 +            Vec3.ZERO,
 +            0.0D
 +        );
-+    }
-+
-+
+     }
+ 
      public ClientboundAddEntityPacket(FriendlyByteBuf buf) {
-         this.id = buf.readVarInt();
-         this.uuid = buf.readUUID();
-@@ -118,27 +134,27 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
+@@ -118,27 +133,27 @@ public class ClientboundAddEntityPacket implements Packet<ClientGamePacketListen
      }
  
      public double getXa() {
@@ -102,46 +99,273 @@ index 0dd611aed9749ebed64e74fc4c2599c3c7f3ff2c..c73c324a9ef2f935e56d198b3b477b98
      }
  
      public int getData() {
-diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
-index 929483116d05a803d317ece7a44861af8bd36665..c7a674505a9ffad1029e2da1067d05caec421e93 100644
---- a/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
-+++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
-@@ -25,10 +25,16 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
-         this.entries = players.stream().map(ClientboundPlayerInfoUpdatePacket.Entry::new).toList();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundInitializeBorderPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundInitializeBorderPacket.java
+index d39adce28d12e9aa4e15701fc8402587f2274c11..d28d850a118480e30c15d1db7f9bce223c67de69 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundInitializeBorderPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundInitializeBorderPacket.java
+@@ -2,12 +2,14 @@ package net.minecraft.network.protocol.game;
+ 
+ import net.minecraft.network.FriendlyByteBuf;
+ import net.minecraft.network.protocol.Packet;
++import net.minecraft.server.level.ServerLevel;
+ import net.minecraft.world.level.border.WorldBorder;
++import javax.annotation.Nullable;
+ 
+ public class ClientboundInitializeBorderPacket implements Packet<ClientGamePacketListener> {
+ 
+-    private final double newCenterX;
+-    private final double newCenterZ;
++    private double newCenterX;
++    private double newCenterZ;
+     private final double oldSize;
+     private final double newSize;
+     private final long lerpTime;
+@@ -26,10 +28,10 @@ public class ClientboundInitializeBorderPacket implements Packet<ClientGamePacke
+         this.warningTime = buf.readVarInt();
      }
  
-+    public ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action action, ClientboundPlayerInfoUpdatePacket.Entry entry) {
+-    public ClientboundInitializeBorderPacket(WorldBorder worldBorder) {
++    public ClientboundInitializeBorderPacket(WorldBorder worldBorder, @Nullable ServerLevel world) {
+         // CraftBukkit start - multiply out nether border
+-        this.newCenterX = worldBorder.getCenterX() * worldBorder.world.dimensionType().coordinateScale();
+-        this.newCenterZ = worldBorder.getCenterZ() * worldBorder.world.dimensionType().coordinateScale();
++        this.newCenterX = worldBorder.getCenterX();
++        this.newCenterZ = worldBorder.getCenterZ();
+         // CraftBukkit end
+         this.oldSize = worldBorder.getSize();
+         this.newSize = worldBorder.getLerpTarget();
+@@ -37,6 +39,15 @@ public class ClientboundInitializeBorderPacket implements Packet<ClientGamePacke
+         this.newAbsoluteMaxSize = worldBorder.getAbsoluteMaxSize();
+         this.warningBlocks = worldBorder.getWarningBlocks();
+         this.warningTime = worldBorder.getWarningTime();
++        if (world != null) {
++            double scale = world.dimensionType().coordinateScale();
++            newCenterX *= scale;
++            newCenterZ *= scale;
++        }
++    }
++
++    public ClientboundInitializeBorderPacket(WorldBorder worldBorder) {
++        this(worldBorder, worldBorder.world);
+     }
+ 
+     @Override
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundMoveEntityPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundMoveEntityPacket.java
+index 4d63a00fbe70de54987301d8b950c2750712cb11..dd5d2986b7023751c6b8e980697c7a45087363b4 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundMoveEntityPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundMoveEntityPacket.java
+@@ -44,6 +44,10 @@ public abstract class ClientboundMoveEntityPacket implements Packet<ClientGamePa
+         return world.getEntity(this.entityId);
+     }
+ 
++    public int getEntityId() {
++        return entityId;
++    }
++
+     public short getXa() {
+         return this.xa;
+     }
+@@ -81,13 +85,13 @@ public abstract class ClientboundMoveEntityPacket implements Packet<ClientGamePa
+             super(entityId, deltaX, deltaY, deltaZ, (byte)0, (byte)0, onGround, false, true);
+         }
+ 
+-        public static ClientboundMoveEntityPacket.Pos read(FriendlyByteBuf buf) {
++        public static Pos read(FriendlyByteBuf buf) {
+             int i = buf.readVarInt();
+             short s = buf.readShort();
+             short t = buf.readShort();
+             short u = buf.readShort();
+             boolean bl = buf.readBoolean();
+-            return new ClientboundMoveEntityPacket.Pos(i, s, t, u, bl);
++            return new Pos(i, s, t, u, bl);
+         }
+ 
+         @Override
+@@ -105,7 +109,7 @@ public abstract class ClientboundMoveEntityPacket implements Packet<ClientGamePa
+             super(entityId, deltaX, deltaY, deltaZ, yaw, pitch, onGround, true, true);
+         }
+ 
+-        public static ClientboundMoveEntityPacket.PosRot read(FriendlyByteBuf buf) {
++        public static PosRot read(FriendlyByteBuf buf) {
+             int i = buf.readVarInt();
+             short s = buf.readShort();
+             short t = buf.readShort();
+@@ -113,7 +117,7 @@ public abstract class ClientboundMoveEntityPacket implements Packet<ClientGamePa
+             byte b = buf.readByte();
+             byte c = buf.readByte();
+             boolean bl = buf.readBoolean();
+-            return new ClientboundMoveEntityPacket.PosRot(i, s, t, u, b, c, bl);
++            return new PosRot(i, s, t, u, b, c, bl);
+         }
+ 
+         @Override
+@@ -133,12 +137,12 @@ public abstract class ClientboundMoveEntityPacket implements Packet<ClientGamePa
+             super(entityId, (short)0, (short)0, (short)0, yaw, pitch, onGround, true, false);
+         }
+ 
+-        public static ClientboundMoveEntityPacket.Rot read(FriendlyByteBuf buf) {
++        public static Rot read(FriendlyByteBuf buf) {
+             int i = buf.readVarInt();
+             byte b = buf.readByte();
+             byte c = buf.readByte();
+             boolean bl = buf.readBoolean();
+-            return new ClientboundMoveEntityPacket.Rot(i, b, c, bl);
++            return new Rot(i, b, c, bl);
+         }
+ 
+         @Override
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
+index 929483116d05a803d317ece7a44861af8bd36665..6cb7d5ea9dbe6cebf5627e694e22e23c55ec7f6f 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
+@@ -17,64 +17,70 @@ import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.world.level.GameType;
+ 
+ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacketListener> {
+-    private final EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions;
+-    private final List<ClientboundPlayerInfoUpdatePacket.Entry> entries;
++    private final EnumSet<Action> actions;
++    private final List<Entry> entries;
+ 
+-    public ClientboundPlayerInfoUpdatePacket(EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions, Collection<ServerPlayer> players) {
++    public ClientboundPlayerInfoUpdatePacket(Action action, Entry entry) {
 +        this.actions = EnumSet.of(action);
 +        this.entries = List.of(entry);
 +    }
 +
-     public ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action action, ServerPlayer player) {
++    public ClientboundPlayerInfoUpdatePacket(EnumSet<Action> actions, Collection<ServerPlayer> players) {
+         this.actions = actions;
+-        this.entries = players.stream().map(ClientboundPlayerInfoUpdatePacket.Entry::new).toList();
++        this.entries = players.stream().map(Entry::new).toList();
+     }
+ 
+-    public ClientboundPlayerInfoUpdatePacket(ClientboundPlayerInfoUpdatePacket.Action action, ServerPlayer player) {
++    public ClientboundPlayerInfoUpdatePacket(Action action, ServerPlayer player) {
          this.actions = EnumSet.of(action);
-         this.entries = List.of(new ClientboundPlayerInfoUpdatePacket.Entry(player));
+-        this.entries = List.of(new ClientboundPlayerInfoUpdatePacket.Entry(player));
++        this.entries = List.of(new Entry(player));
      }
 +
      // Paper start
-     public ClientboundPlayerInfoUpdatePacket(EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions, List<ClientboundPlayerInfoUpdatePacket.Entry> entries) {
+-    public ClientboundPlayerInfoUpdatePacket(EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions, List<ClientboundPlayerInfoUpdatePacket.Entry> entries) {
++    public ClientboundPlayerInfoUpdatePacket(EnumSet<Action> actions, List<Entry> entries) {
          this.actions = actions;
-@@ -74,7 +80,7 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+         this.entries = entries;
+     }
+ 
+-    public ClientboundPlayerInfoUpdatePacket(EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions, ClientboundPlayerInfoUpdatePacket.Entry entry) {
++    public ClientboundPlayerInfoUpdatePacket(EnumSet<Action> actions, Entry entry) {
+         this.actions = actions;
+         this.entries = List.of(entry);
+     }
+     // Paper end
+ 
+     public static ClientboundPlayerInfoUpdatePacket createPlayerInitializing(Collection<ServerPlayer> players) {
+-        EnumSet<ClientboundPlayerInfoUpdatePacket.Action> enumSet = EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, ClientboundPlayerInfoUpdatePacket.Action.INITIALIZE_CHAT, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME);
++        EnumSet<Action> enumSet = EnumSet.of(Action.ADD_PLAYER, Action.INITIALIZE_CHAT, Action.UPDATE_GAME_MODE, Action.UPDATE_LISTED, Action.UPDATE_LATENCY, Action.UPDATE_DISPLAY_NAME);
+         return new ClientboundPlayerInfoUpdatePacket(enumSet, players);
+     }
+ 
+     // Paper start
+     public static ClientboundPlayerInfoUpdatePacket createPlayerInitializing(Collection<ServerPlayer> players, ServerPlayer forPlayer) {
+-        final EnumSet<ClientboundPlayerInfoUpdatePacket.Action> enumSet = EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, ClientboundPlayerInfoUpdatePacket.Action.INITIALIZE_CHAT, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME);
+-        final List<ClientboundPlayerInfoUpdatePacket.Entry> entries = new java.util.ArrayList<>(players.size());
++        final EnumSet<Action> enumSet = EnumSet.of(Action.ADD_PLAYER, Action.INITIALIZE_CHAT, Action.UPDATE_GAME_MODE, Action.UPDATE_LISTED, Action.UPDATE_LATENCY, Action.UPDATE_DISPLAY_NAME);
++        final List<Entry> entries = new java.util.ArrayList<>(players.size());
+         final org.bukkit.craftbukkit.entity.CraftPlayer bukkitEntity = forPlayer.getBukkitEntity();
+         for (final ServerPlayer player : players) {
+-            entries.add(new ClientboundPlayerInfoUpdatePacket.Entry(player, bukkitEntity.isListed(player.getBukkitEntity())));
++            entries.add(new Entry(player, bukkitEntity.isListed(player.getBukkitEntity())));
+         }
+         return new ClientboundPlayerInfoUpdatePacket(enumSet, entries);
+     }
+ 
+     public static ClientboundPlayerInfoUpdatePacket createSinglePlayerInitializing(ServerPlayer player, boolean listed) {
+-        final EnumSet<ClientboundPlayerInfoUpdatePacket.Action> enumSet = EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER, ClientboundPlayerInfoUpdatePacket.Action.INITIALIZE_CHAT, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_GAME_MODE, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LATENCY, ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME);
+-        final List<ClientboundPlayerInfoUpdatePacket.Entry> entries = List.of(new Entry(player, listed));
++        final EnumSet<Action> enumSet = EnumSet.of(Action.ADD_PLAYER, Action.INITIALIZE_CHAT, Action.UPDATE_GAME_MODE, Action.UPDATE_LISTED, Action.UPDATE_LATENCY, Action.UPDATE_DISPLAY_NAME);
++        final List<Entry> entries = List.of(new Entry(player, listed));
+         return new ClientboundPlayerInfoUpdatePacket(enumSet, entries);
+     }
+ 
+     public static ClientboundPlayerInfoUpdatePacket updateListed(UUID playerInfoId, boolean listed) {
+-        EnumSet<ClientboundPlayerInfoUpdatePacket.Action> enumSet = EnumSet.of(ClientboundPlayerInfoUpdatePacket.Action.UPDATE_LISTED);
+-        return new ClientboundPlayerInfoUpdatePacket(enumSet, new ClientboundPlayerInfoUpdatePacket.Entry(playerInfoId, listed));
++        EnumSet<Action> enumSet = EnumSet.of(Action.UPDATE_LISTED);
++        return new ClientboundPlayerInfoUpdatePacket(enumSet, new Entry(playerInfoId, listed));
+     }
+     // Paper end
+ 
+     public ClientboundPlayerInfoUpdatePacket(FriendlyByteBuf buf) {
+-        this.actions = buf.readEnumSet(ClientboundPlayerInfoUpdatePacket.Action.class);
++        this.actions = buf.readEnumSet(Action.class);
          this.entries = buf.readList((buf2) -> {
-             ClientboundPlayerInfoUpdatePacket.EntryBuilder entryBuilder = new ClientboundPlayerInfoUpdatePacket.EntryBuilder(buf2.readUUID());
+-            ClientboundPlayerInfoUpdatePacket.EntryBuilder entryBuilder = new ClientboundPlayerInfoUpdatePacket.EntryBuilder(buf2.readUUID());
++            EntryBuilder entryBuilder = new EntryBuilder(buf2.readUUID());
  
 -            for(ClientboundPlayerInfoUpdatePacket.Action action : this.actions) {
-+            for (ClientboundPlayerInfoUpdatePacket.Action action : this.actions) {
++            for (Action action : this.actions) {
                  action.reader.read(entryBuilder, buf2);
              }
  
-@@ -88,7 +94,7 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+@@ -84,11 +90,11 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+ 
+     @Override
+     public void write(FriendlyByteBuf buf) {
+-        buf.writeEnumSet(this.actions, ClientboundPlayerInfoUpdatePacket.Action.class);
++        buf.writeEnumSet(this.actions, Action.class);
          buf.writeCollection(this.entries, (buf2, entry) -> {
              buf2.writeUUID(entry.profileId());
  
 -            for(ClientboundPlayerInfoUpdatePacket.Action action : this.actions) {
-+            for (ClientboundPlayerInfoUpdatePacket.Action action : this.actions) {
++            for (Action action : this.actions) {
                  action.writer.write(buf2, entry);
              }
  
-@@ -176,15 +182,19 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+@@ -100,16 +106,16 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+         listener.handlePlayerInfoUpdate(this);
+     }
+ 
+-    public EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions() {
++    public EnumSet<Action> actions() {
+         return this.actions;
+     }
+ 
+-    public List<ClientboundPlayerInfoUpdatePacket.Entry> entries() {
++    public List<Entry> entries() {
+         return this.entries;
+     }
+ 
+-    public List<ClientboundPlayerInfoUpdatePacket.Entry> newEntries() {
+-        return this.actions.contains(ClientboundPlayerInfoUpdatePacket.Action.ADD_PLAYER) ? this.entries : List.of();
++    public List<Entry> newEntries() {
++        return this.actions.contains(Action.ADD_PLAYER) ? this.entries : List.of();
+     }
+ 
+     @Override
+@@ -159,32 +165,36 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+             buf.writeNullable(entry.displayName(), FriendlyByteBuf::writeComponent);
+         });
+ 
+-        final ClientboundPlayerInfoUpdatePacket.Action.Reader reader;
+-        final ClientboundPlayerInfoUpdatePacket.Action.Writer writer;
++        final Reader reader;
++        final Writer writer;
+ 
+-        private Action(ClientboundPlayerInfoUpdatePacket.Action.Reader reader, ClientboundPlayerInfoUpdatePacket.Action.Writer writer) {
++        private Action(Reader reader, Writer writer) {
+             this.reader = reader;
+             this.writer = writer;
+         }
+ 
+         public interface Reader {
+-            void read(ClientboundPlayerInfoUpdatePacket.EntryBuilder serialized, FriendlyByteBuf buf);
++            void read(EntryBuilder serialized, FriendlyByteBuf buf);
+         }
+ 
+         public interface Writer {
+-            void write(FriendlyByteBuf buf, ClientboundPlayerInfoUpdatePacket.Entry entry);
++            void write(FriendlyByteBuf buf, Entry entry);
          }
      }
  
@@ -162,6 +386,69 @@ index 929483116d05a803d317ece7a44861af8bd36665..c7a674505a9ffad1029e2da1067d05ca
          // Paper start
          Entry(UUID profileId, boolean listed) {
              this(profileId, null, listed, 0, GameType.DEFAULT_MODE, null, null);
+@@ -208,8 +218,8 @@ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacke
+             this.profileId = profileId;
+         }
+ 
+-        ClientboundPlayerInfoUpdatePacket.Entry build() {
+-            return new ClientboundPlayerInfoUpdatePacket.Entry(this.profileId, this.profile, this.listed, this.latency, this.gameMode, this.displayName, this.chatSession);
++        Entry build() {
++            return new Entry(this.profileId, this.profile, this.listed, this.latency, this.gameMode, this.displayName, this.chatSession);
+         }
+     }
+ }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
+index 15ebf22e9ca11870e5f24ff5ab8bcbee8c571ee3..83571514d76484c1c1aef2add5f2321433bd2e86 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundRotateHeadPacket.java
+@@ -10,7 +10,11 @@ public class ClientboundRotateHeadPacket implements Packet<ClientGamePacketListe
+     private final byte yHeadRot;
+ 
+     public ClientboundRotateHeadPacket(Entity entity, byte headYaw) {
+-        this.entityId = entity.getId();
++        this(entity.getId(), headYaw);
++    }
++
++    public ClientboundRotateHeadPacket(int entityId, byte headYaw) {
++        this.entityId = entityId;
+         this.yHeadRot = headYaw;
+     }
+ 
+@@ -34,6 +38,10 @@ public class ClientboundRotateHeadPacket implements Packet<ClientGamePacketListe
+         return world.getEntity(this.entityId);
+     }
+ 
++    public int getEntityId() {
++        return entityId;
++    }
++
+     public byte getYHeadRot() {
+         return this.yHeadRot;
+     }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetBorderCenterPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetBorderCenterPacket.java
+index bcbedd82d41b825afad5d35c9081d8b50113c269..42899c384d5c33230ce564c3545c473cb6d68874 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetBorderCenterPacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetBorderCenterPacket.java
+@@ -11,11 +11,17 @@ public class ClientboundSetBorderCenterPacket implements Packet<ClientGamePacket
+ 
+     public ClientboundSetBorderCenterPacket(WorldBorder worldBorder) {
+         // CraftBukkit start - multiply out nether border
+-        this.newCenterX = worldBorder.getCenterX() * (worldBorder.world != null ? worldBorder.world.dimensionType().coordinateScale() : 1.0);
+-        this.newCenterZ = worldBorder.getCenterZ() * (worldBorder.world != null ? worldBorder.world.dimensionType().coordinateScale() : 1.0);
++        this(worldBorder.getCenterX() * (worldBorder.world != null ? worldBorder.world.dimensionType().coordinateScale() : 1.0),
++            worldBorder.getCenterZ() * (worldBorder.world != null ? worldBorder.world.dimensionType().coordinateScale() : 1.0)
++        );
+         // CraftBukkit end
+     }
+ 
++    public ClientboundSetBorderCenterPacket(double newCenterX, double newCenterZ) {
++        this.newCenterX = newCenterX;
++        this.newCenterZ = newCenterZ;
++    }
++
+     public ClientboundSetBorderCenterPacket(FriendlyByteBuf buf) {
+         this.newCenterX = buf.readDouble();
+         this.newCenterZ = buf.readDouble();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetDisplayObjectivePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetDisplayObjectivePacket.java
 index 103b2e5e3a00d1e9e86882d9fa458d0003f5b008..9f42d6788d5ff04c6cc434749dafb87a936f2b18 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetDisplayObjectivePacket.java
@@ -179,17 +466,14 @@ index 103b2e5e3a00d1e9e86882d9fa458d0003f5b008..9f42d6788d5ff04c6cc434749dafb87a
          this.slot = buf.readById(DisplaySlot.BY_ID);
          this.objectiveName = buf.readUtf();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetObjectivePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetObjectivePacket.java
-index 9d086186616b5768b42060912952d34c962992df..90697428b870013823bbc7764f3298f051330a5c 100644
+index 9d086186616b5768b42060912952d34c962992df..bcd11e6b452d14c1b532d1729c6a0f3b73c53a3a 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetObjectivePacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetObjectivePacket.java
-@@ -23,6 +23,16 @@ public class ClientboundSetObjectivePacket implements Packet<ClientGamePacketLis
+@@ -23,6 +23,13 @@ public class ClientboundSetObjectivePacket implements Packet<ClientGamePacketLis
          this.method = mode;
      }
  
-+    public ClientboundSetObjectivePacket(String objectiveName,
-+                                         Component displayName,
-+                                         ObjectiveCriteria.RenderType renderType,
-+                                         int mode) {
++    public ClientboundSetObjectivePacket(String objectiveName, Component displayName, ObjectiveCriteria.RenderType renderType, int mode) {
 +        this.objectiveName = objectiveName;
 +        this.displayName = displayName;
 +        this.renderType = renderType;
@@ -200,7 +484,7 @@ index 9d086186616b5768b42060912952d34c962992df..90697428b870013823bbc7764f3298f0
          this.objectiveName = buf.readUtf();
          this.method = buf.readByte();
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
-index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..ec778f965c95f4fb4c97d641e04d953abd6d9932 100644
+index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..1850d887cd80b091e59791435fd73a509175c2c4 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundSetPlayerTeamPacket.java
 @@ -9,6 +9,7 @@ import net.minecraft.network.FriendlyByteBuf;
@@ -211,27 +495,99 @@ index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..ec778f965c95f4fb4c97d641e04d953a
  
  public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketListener> {
      private static final int METHOD_ADD = 0;
-@@ -23,7 +24,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+@@ -21,9 +22,9 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+     private final int method;
+     private final String name;
      private final Collection<String> players;
-     private final Optional<ClientboundSetPlayerTeamPacket.Parameters> parameters;
+-    private final Optional<ClientboundSetPlayerTeamPacket.Parameters> parameters;
++    private final Optional<Parameters> parameters;
  
 -    private ClientboundSetPlayerTeamPacket(String teamName, int packetType, Optional<ClientboundSetPlayerTeamPacket.Parameters> team, Collection<String> playerNames) {
-+    public ClientboundSetPlayerTeamPacket(String teamName, int packetType, Optional<ClientboundSetPlayerTeamPacket.Parameters> team, Collection<String> playerNames) {
++    public ClientboundSetPlayerTeamPacket(String teamName, int packetType, Optional<Parameters> team, Collection<String> playerNames) {
          this.name = teamName;
          this.method = packetType;
          this.parameters = team;
-@@ -31,7 +32,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+@@ -31,20 +32,20 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
      }
  
      public static ClientboundSetPlayerTeamPacket createAddOrModifyPacket(PlayerTeam team, boolean updatePlayers) {
 -        return new ClientboundSetPlayerTeamPacket(team.getName(), updatePlayers ? 0 : 2, Optional.of(new ClientboundSetPlayerTeamPacket.Parameters(team)), (Collection<String>)(updatePlayers ? team.getPlayers() : ImmutableList.of()));
-+        return new ClientboundSetPlayerTeamPacket(team.getName(), updatePlayers ? 0 : 2, Optional.of(new ClientboundSetPlayerTeamPacket.Parameters(team)), (Collection<String>) (updatePlayers ? team.getPlayers() : ImmutableList.of()));
++        return new ClientboundSetPlayerTeamPacket(team.getName(), updatePlayers ? 0 : 2, Optional.of(new Parameters(team)), (Collection<String>) (updatePlayers ? team.getPlayers() : ImmutableList.of()));
      }
  
      public static ClientboundSetPlayerTeamPacket createRemovePacket(PlayerTeam team) {
-@@ -147,6 +148,26 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
-         private final ChatFormatting color;
-         private final int options;
+         return new ClientboundSetPlayerTeamPacket(team.getName(), 1, Optional.empty(), ImmutableList.of());
+     }
+ 
+-    public static ClientboundSetPlayerTeamPacket createPlayerPacket(PlayerTeam team, String playerName, ClientboundSetPlayerTeamPacket.Action operation) {
+-        return new ClientboundSetPlayerTeamPacket(team.getName(), operation == ClientboundSetPlayerTeamPacket.Action.ADD ? 3 : 4, Optional.empty(), ImmutableList.of(playerName));
++    public static ClientboundSetPlayerTeamPacket createPlayerPacket(PlayerTeam team, String playerName, Action operation) {
++        return new ClientboundSetPlayerTeamPacket(team.getName(), operation == Action.ADD ? 3 : 4, Optional.empty(), ImmutableList.of(playerName));
+     }
+ 
+     // Paper start
+-    public static ClientboundSetPlayerTeamPacket createMultiplePlayerPacket(PlayerTeam team, Collection<String> players, ClientboundSetPlayerTeamPacket.Action operation) {
+-        return new ClientboundSetPlayerTeamPacket(team.getName(), operation == ClientboundSetPlayerTeamPacket.Action.ADD ? 3 : 4, Optional.empty(), players);
++    public static ClientboundSetPlayerTeamPacket createMultiplePlayerPacket(PlayerTeam team, Collection<String> players, Action operation) {
++        return new ClientboundSetPlayerTeamPacket(team.getName(), operation == Action.ADD ? 3 : 4, Optional.empty(), players);
+     }
+     // Paper end
+ 
+@@ -52,7 +53,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+         this.name = buf.readUtf();
+         this.method = buf.readByte();
+         if (shouldHaveParameters(this.method)) {
+-            this.parameters = Optional.of(new ClientboundSetPlayerTeamPacket.Parameters(buf));
++            this.parameters = Optional.of(new Parameters(buf));
+         } else {
+             this.parameters = Optional.empty();
+         }
+@@ -90,27 +91,27 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+     }
+ 
+     @Nullable
+-    public ClientboundSetPlayerTeamPacket.Action getPlayerAction() {
++    public Action getPlayerAction() {
+         switch (this.method) {
+             case 0:
+             case 3:
+-                return ClientboundSetPlayerTeamPacket.Action.ADD;
++                return Action.ADD;
+             case 1:
+             case 2:
+             default:
+                 return null;
+             case 4:
+-                return ClientboundSetPlayerTeamPacket.Action.REMOVE;
++                return Action.REMOVE;
+         }
+     }
+ 
+     @Nullable
+-    public ClientboundSetPlayerTeamPacket.Action getTeamAction() {
++    public Action getTeamAction() {
+         switch (this.method) {
+             case 0:
+-                return ClientboundSetPlayerTeamPacket.Action.ADD;
++                return Action.ADD;
+             case 1:
+-                return ClientboundSetPlayerTeamPacket.Action.REMOVE;
++                return Action.REMOVE;
+             default:
+                 return null;
+         }
+@@ -129,7 +130,7 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+         return this.players;
+     }
+ 
+-    public Optional<ClientboundSetPlayerTeamPacket.Parameters> getParameters() {
++    public Optional<Parameters> getParameters() {
+         return this.parameters;
+     }
+ 
+@@ -167,6 +168,26 @@ public class ClientboundSetPlayerTeamPacket implements Packet<ClientGamePacketLi
+             this.playerSuffix = buf.readComponent();
+         }
  
 +        public Parameters(String displayName, String prefix, String suffix, String nametagVisibility, String collisionRule, ChatFormatting color, int options) {
 +            this.displayName = CraftChatMessage.fromString(displayName)[0];
@@ -253,11 +609,11 @@ index 4ebe22ac20f1a98694cc3bec570ef5bbf06f00aa..ec778f965c95f4fb4c97d641e04d953a
 +            this.options = options;
 +        }
 +
-         public Parameters(PlayerTeam team) {
-             this.displayName = team.getDisplayName();
-             this.options = team.packOptions();
+         public Component getDisplayName() {
+             return this.displayName;
+         }
 diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundTeleportEntityPacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundTeleportEntityPacket.java
-index d5f404fb6dc09c48d84b4a3e75c12f2fbb53c224..51d0bb0d5d664b4326d3a3eabf1078a326b72fbd 100644
+index d5f404fb6dc09c48d84b4a3e75c12f2fbb53c224..d90ebe50e9cf8aaa051a4a06f5b5eb912eb0b866 100644
 --- a/src/main/java/net/minecraft/network/protocol/game/ClientboundTeleportEntityPacket.java
 +++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundTeleportEntityPacket.java
 @@ -4,6 +4,7 @@ import net.minecraft.network.FriendlyByteBuf;
@@ -268,34 +624,41 @@ index d5f404fb6dc09c48d84b4a3e75c12f2fbb53c224..51d0bb0d5d664b4326d3a3eabf1078a3
  
  public class ClientboundTeleportEntityPacket implements Packet<ClientGamePacketListener> {
      private final int id;
-@@ -20,11 +21,28 @@ public class ClientboundTeleportEntityPacket implements Packet<ClientGamePacketL
-         this.x = vec3.x;
-         this.y = vec3.y;
-         this.z = vec3.z;
--        this.yRot = (byte)((int)(entity.getYRot() * 256.0F / 360.0F));
--        this.xRot = (byte)((int)(entity.getXRot() * 256.0F / 360.0F));
-+        this.yRot = (byte) ((int) (entity.getYRot() * 256.0F / 360.0F));
-+        this.xRot = (byte) ((int) (entity.getXRot() * 256.0F / 360.0F));
+@@ -25,6 +26,20 @@ public class ClientboundTeleportEntityPacket implements Packet<ClientGamePacketL
          this.onGround = entity.onGround();
      }
  
-+    public ClientboundTeleportEntityPacket(int entityId, Vec3 vec3, byte yRot, byte xRot, boolean onGround) {
-+        this.id = entityId;
-+        this.x = vec3.x;
-+        this.y = vec3.y;
-+        this.z = vec3.z;
-+        this.yRot = yRot;
-+        this.xRot = xRot;
-+        this.onGround = onGround;
++    public ClientboundTeleportEntityPacket(int entityId, Location location) {
++        this(entityId, location.getX(), location.getY(), location.getZ(), (byte) 0, (byte) 0, false);
 +    }
 +
-+    public ClientboundTeleportEntityPacket(int entityId, Location location) {
-+        this(entityId, Vec3.ZERO,
-+            (byte) (location.getYaw() * 256.0F / 360.0F),
-+            (byte) (location.getYaw() * 256.0F / 360.0F),
-+            false);
++    public ClientboundTeleportEntityPacket(int entityId, double x, double y, double z, byte pitch, byte yaw, boolean onGround) {
++        this.id = entityId;
++        this.x = x;
++        this.y = y;
++        this.z = z;
++        this.yRot = pitch;
++        this.xRot = yaw;
++        this.onGround = onGround;
 +    }
 +
      public ClientboundTeleportEntityPacket(FriendlyByteBuf buf) {
          this.id = buf.readVarInt();
          this.x = buf.readDouble();
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..5113926a31947e80777e9b6d008a2a3264af7ae5 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -205,6 +205,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         this.firstPlayed = System.currentTimeMillis();
+     }
+ 
++    @Override
++    public void sendPacket(@NotNull Object obj) {
++        if (obj instanceof Packet<?> packet)
++            getHandle().connection.send(packet);
++    }
++
+     // Paper start - implement view distances
+     @Override
+     public int getViewDistance() {
