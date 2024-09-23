@@ -1,0 +1,227 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Tue, 24 Sep 2024 01:08:47 +0300
+Subject: [PATCH] Helpers
+
+
+diff --git a/pom.xml b/pom.xml
+index 6fd6066b16d4dbf8695be16ec8b2d135d4d04901..0bb818ca92284fc39b870fb5be359f5236ca73b2 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -47,6 +47,13 @@
+     <!-- Paper end -->
+ 
+     <dependencies>
++        <dependency>
++            <groupId>ru.minecomplex.libs</groupId>
++            <artifactId>core</artifactId>
++            <version>DEV</version>
++            <type>pom</type>
++            <scope>compile</scope>
++        </dependency>
+         <!-- Paper start -->
+         <dependency>
+             <groupId>net.kyori</groupId>
+diff --git a/src/main/java/org/bukkit/Location.java b/src/main/java/org/bukkit/Location.java
+index 432d5711b7ec34eafeb27df82d367612dfe1fe54..92303dd833e05b4595859ed945b83a2f9d5dee89 100644
+--- a/src/main/java/org/bukkit/Location.java
++++ b/src/main/java/org/bukkit/Location.java
+@@ -13,7 +13,9 @@ import org.bukkit.util.NumberConversions;
+ import org.bukkit.util.Vector;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
+-
++import org.bson.codecs.pojo.annotations.BsonCreator;
++import org.bson.codecs.pojo.annotations.BsonIgnore;
++import org.bson.codecs.pojo.annotations.BsonProperty;
+ // Paper start
+ import java.util.Collection;
+ import java.util.function.Predicate;
+@@ -31,7 +33,9 @@ import org.bukkit.entity.Player;
+  * representation by the implementation.
+  */
+ public class Location implements Cloneable, ConfigurationSerializable {
++    @BsonIgnore
+     private Reference<World> world;
++    private String worldName;
+     private double x;
+     private double y;
+     private double z;
+@@ -73,12 +77,29 @@ public class Location implements Cloneable, ConfigurationSerializable {
+     }
+ 
+     /**
+-     * Sets the world that this location resides in
++     * Constructs a new Location with the given coordinates and direction
+      *
+-     * @param world New world that this location resides in
+-     */
+-    public void setWorld(@Nullable World world) {
+-        this.world = (world == null) ? null : new WeakReference<>(world);
++     * @param worldName The world in which this location resides
++     * @param x         The x-coordinate of this new location
++     * @param y         The y-coordinate of this new location
++     * @param z         The z-coordinate of this new location
++     * @param yaw       The absolute rotation on the x-plane, in degrees
++     * @param pitch     The absolute rotation on the y-plane, in degrees
++     */
++    @BsonCreator
++    public Location(@UndefinedNullability @BsonProperty("worldName") final String worldName,
++                    @BsonProperty("x") final double x,
++                    @BsonProperty("y") final double y,
++                    @BsonProperty("z") final double z,
++                    @BsonProperty("yaw") final float yaw,
++                    @BsonProperty("pitch") final float pitch) { // Paper
++        this.worldName = worldName;
++        this.x = x;
++        this.y = y;
++        this.z = z;
++        this.pitch = pitch;
++        this.yaw = yaw;
++        setWorld(findWorld());
+     }
+ 
+     /**
+@@ -86,12 +107,9 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      *
+      * @return true if is loaded, otherwise false
+      */
++    @BsonIgnore
+     public boolean isWorldLoaded() {
+-        if (this.world == null) {
+-            return false;
+-        }
+-
+-        World world = this.world.get();
++        World world = findWorld();
+         return world != null && Bukkit.getWorld(world.getUID()) != null;
+     }
+ 
+@@ -102,23 +120,55 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      * @throws IllegalArgumentException when world is unloaded
+      * @see #isWorldLoaded()
+      */
+-    @UndefinedNullability
++    @BsonIgnore
++    @UndefinedNullability // Paper
+     public World getWorld() {
+-        if (this.world == null) {
++        if (this.world == null && this.worldName == null) {
+             return null;
+         }
+ 
+-        World world = this.world.get();
++        World world = findWorld();
+         Preconditions.checkArgument(world != null, "World unloaded");
+         return world;
+     }
+ 
++    /**
++     * Sets the world that this location resides in
++     *
++     * @param world New world that this location resides in
++     */
++    @BsonIgnore
++    public void setWorld(@Nullable World world) {
++        this.world = (world == null) ? null : new WeakReference<>(world);
++        this.worldName = (world == null) ? null : world.getName();
++    }
++
++    private World findWorld() {
++        World world = null;
++        if (this.world != null) {
++            world = this.world.get();
++        } else if (worldName != null) {
++            world = Bukkit.getWorld(worldName);
++        }
++        return world;
++    }
++
++    @UndefinedNullability
++    public String getWorldName() {
++        return worldName;
++    }
++
++    public void setWorldName(@UndefinedNullability String worldName) {
++        this.worldName = worldName;
++    }
++
+     /**
+      * Gets the chunk at the represented location
+      *
+      * @return Chunk at the represented location
+      */
+     @NotNull
++    @BsonIgnore
+     public Chunk getChunk() {
+         return getWorld().getChunkAt(this);
+     }
+@@ -129,6 +179,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      * @return Block at the represented location
+      */
+     @NotNull
++    @BsonIgnore
+     public Block getBlock() {
+         return getWorld().getBlockAt(this);
+     }
+@@ -157,6 +208,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      *
+      * @return block X
+      */
++    @BsonIgnore
+     public int getBlockX() {
+         return locToBlock(x);
+     }
+@@ -185,6 +237,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      *
+      * @return block y
+      */
++    @BsonIgnore
+     public int getBlockY() {
+         return locToBlock(y);
+     }
+@@ -213,6 +266,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      *
+      * @return block z
+      */
++    @BsonIgnore
+     public int getBlockZ() {
+         return locToBlock(z);
+     }
+@@ -293,6 +347,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      *     #getPitch() pitch} and {@link #getYaw() yaw}
+      */
+     @NotNull
++    @BsonIgnore
+     public Vector getDirection() {
+         Vector vector = new Vector();
+ 
+@@ -543,6 +598,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+         return this;
+     }
+ 
++    @BsonIgnore
+     public boolean isChunkLoaded() { return this.getWorld().isChunkLoaded(locToBlock(x) >> 4, locToBlock(z) >> 4); } // Paper
+ 
+     // Paper start
+@@ -551,6 +607,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      *
+      * @return true if a chunk has been generated at this location
+      */
++    @BsonIgnore
+     public boolean isGenerated() {
+         World world = this.getWorld();
+         Preconditions.checkNotNull(world, "Location has no world!");
+diff --git a/src/main/java/org/bukkit/entity/Player.java b/src/main/java/org/bukkit/entity/Player.java
+index df1da8a7dec072ddc33a884973bcad67152576fe..fe37a6d240bd8d82e3f9faef0e96d629dc1202f6 100644
+--- a/src/main/java/org/bukkit/entity/Player.java
++++ b/src/main/java/org/bukkit/entity/Player.java
+@@ -41,6 +41,8 @@ import org.jetbrains.annotations.Nullable;
+  */
+ public interface Player extends HumanEntity, Conversable, OfflinePlayer, PluginMessageRecipient, net.kyori.adventure.identity.Identified, com.destroystokyo.paper.network.NetworkClient { // Paper
+ 
++    void sendPacket(@NotNull Object packet);
++
+     // Paper start
+     @Override
+     default @NotNull net.kyori.adventure.identity.Identity identity() {

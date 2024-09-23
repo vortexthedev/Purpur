@@ -1,0 +1,866 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Tue, 24 Sep 2024 01:08:43 +0300
+Subject: [PATCH] Helpers
+
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntity.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntity.java
+index 2b54a5f3347f788b751892105f888663bb349629..439df51f09d5918b35377fe651a23a56c49a534e 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntity.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntity.java
+@@ -8,7 +8,7 @@ import net.minecraft.world.phys.Vec3D;
+ 
+ public class PacketPlayOutEntity implements Packet<PacketListenerPlayOut> {
+ 
+-    protected int a;
++    protected int a; public int getEntityId()  { return a; } // Purpur - OBFHELPER
+     protected short b; public short getX() { return b; } // Purpur - OBFHELPER
+     protected short c; public short getY() { return c; } // Purpur - OBFHELPER
+     protected short d; public short getZ() { return d; } // Purpur - OBFHELPER
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityDestroy.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityDestroy.java
+index 841afe74df06086fc1861228fd8fd28463d024b0..35ff150a04600a7e7d2939e3e8299ec4bf106c53 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityDestroy.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityDestroy.java
+@@ -41,4 +41,9 @@ public class PacketPlayOutEntityDestroy implements Packet<PacketListenerPlayOut>
+     public void a(PacketListenerPlayOut packetlistenerplayout) {
+         packetlistenerplayout.a(this);
+     }
++
++    public int[] getEntities() {
++        return a;
++    }
++
+ }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityHeadRotation.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityHeadRotation.java
+index cb14309f11236d069a7463bc51094ec2cfa8a7f7..8345086eb4596250992c0940896eb393e6031949 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityHeadRotation.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityHeadRotation.java
+@@ -17,6 +17,11 @@ public class PacketPlayOutEntityHeadRotation implements Packet<PacketListenerPla
+         this.b = b0;
+     }
+ 
++    public PacketPlayOutEntityHeadRotation(int entity, byte b0) {
++        this.a = entity;
++        this.b = b0;
++    }
++
+     @Override
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+         this.a = packetdataserializer.i();
+@@ -32,4 +37,14 @@ public class PacketPlayOutEntityHeadRotation implements Packet<PacketListenerPla
+     public void a(PacketListenerPlayOut packetlistenerplayout) {
+         packetlistenerplayout.a(this);
+     }
++
++    public int getEntityId() {
++        return a;
++    }
++
++    public byte getHeadYaw() {
++        return b;
++    }
++
++
+ }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityTeleport.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityTeleport.java
+index d72ac54bdb0a8cef430f71a5c6d29cbf4c260078..330cee301faaf7b14cf3512ea66440d228f02544 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityTeleport.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutEntityTeleport.java
+@@ -1,9 +1,11 @@
+ package net.minecraft.network.protocol.game;
+ 
+-import java.io.IOException;
+ import net.minecraft.network.PacketDataSerializer;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.entity.Entity;
++import org.bukkit.Location;
++
++import java.io.IOException;
+ 
+ public class PacketPlayOutEntityTeleport implements Packet<PacketListenerPlayOut> {
+ 
+@@ -15,7 +17,8 @@ public class PacketPlayOutEntityTeleport implements Packet<PacketListenerPlayOut
+     private byte f;
+     private boolean g;
+ 
+-    public PacketPlayOutEntityTeleport() {}
++    public PacketPlayOutEntityTeleport() {
++    }
+ 
+     public PacketPlayOutEntityTeleport(Entity entity) {
+         this.a = entity.getId();
+@@ -27,6 +30,21 @@ public class PacketPlayOutEntityTeleport implements Packet<PacketListenerPlayOut
+         this.g = entity.isOnGround();
+     }
+ 
++    public PacketPlayOutEntityTeleport(int entityId, Location location) {
++        this(entityId, location.getX(), location.getY(), location.getZ(), (byte) 0, (byte) 0, false);
++    }
++
++    public PacketPlayOutEntityTeleport(int entityId, double x, double y, double z, byte pitch, byte yaw, boolean onGround) {
++        this.a = entityId;
++        this.b = x;
++        this.c = y;
++        this.d = z;
++        this.e = pitch;
++        this.f = yaw;
++        this.g = onGround;
++    }
++
++
+     @Override
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+         this.a = packetdataserializer.i();
+@@ -52,4 +70,9 @@ public class PacketPlayOutEntityTeleport implements Packet<PacketListenerPlayOut
+     public void a(PacketListenerPlayOut packetlistenerplayout) {
+         packetlistenerplayout.a(this);
+     }
++
++    public int getEntityId() {
++        return a;
++    }
++
+ }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutPlayerInfo.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutPlayerInfo.java
+index 2758cf87fe5cb89c101f2495783c72a2fe4ad632..f96ac149393b5140ed0c12c49f76d72fc32fa968 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutPlayerInfo.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutPlayerInfo.java
+@@ -19,8 +19,22 @@ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
+     private PacketPlayOutPlayerInfo.EnumPlayerInfoAction a;
+     private final List<PacketPlayOutPlayerInfo.PlayerInfoData> b = Lists.newArrayList();
+ 
++    public PlayerInfoData createData(GameProfile profile, int ping, EnumGamemode gamemode, IChatBaseComponent displayName) {
++        return new PlayerInfoData(profile, ping, gamemode, displayName);
++    }
++
+     public PacketPlayOutPlayerInfo() {}
+ 
++    public PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction action, PacketPlayOutPlayerInfo.PlayerInfoData data) {
++        this.a = action;
++        this.b.add(data);
++    }
++
++    public PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction action, List<PacketPlayOutPlayerInfo.PlayerInfoData> data) {
++        this.a = action;
++        this.b.addAll(data);
++    }
++
+     public PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction packetplayoutplayerinfo_enumplayerinfoaction, EntityPlayer... aentityplayer) {
+         this.a = packetplayoutplayerinfo_enumplayerinfoaction;
+         EntityPlayer[] aentityplayer1 = aentityplayer;
+@@ -186,6 +200,7 @@ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
+             this.e = ichatbasecomponent;
+         }
+ 
++
+         public GameProfile a() {
+             return this.d;
+         }
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardDisplayObjective.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardDisplayObjective.java
+index 282ffab0cb9433b6aa0e7e2ad380921e437cfbd0..15639c4c2996faf3b18149b6c53af2f4edeb95e0 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardDisplayObjective.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardDisplayObjective.java
+@@ -23,6 +23,15 @@ public class PacketPlayOutScoreboardDisplayObjective implements Packet<PacketLis
+ 
+     }
+ 
++    public PacketPlayOutScoreboardDisplayObjective(int i, @Nullable String objectiveName) {
++        this.a = i;
++        if (objectiveName == null) {
++            this.b = "";
++        } else {
++            this.b = objectiveName;
++        }
++    }
++
+     @Override
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+         this.a = packetdataserializer.readByte();
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardObjective.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardObjective.java
+index e00583b83883da98ceb30746b20e92ad9e7f559f..75e39c34332e3e57a6ffc7b2717d85986fab5c7d 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardObjective.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardObjective.java
+@@ -1,12 +1,13 @@
+ package net.minecraft.network.protocol.game;
+ 
+-import java.io.IOException;
+ import net.minecraft.network.PacketDataSerializer;
+ import net.minecraft.network.chat.IChatBaseComponent;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.world.scores.ScoreboardObjective;
+ import net.minecraft.world.scores.criteria.IScoreboardCriteria;
+ 
++import java.io.IOException;
++
+ public class PacketPlayOutScoreboardObjective implements Packet<PacketListenerPlayOut> {
+ 
+     private String a;
+@@ -14,7 +15,8 @@ public class PacketPlayOutScoreboardObjective implements Packet<PacketListenerPl
+     private IScoreboardCriteria.EnumScoreboardHealthDisplay c;
+     private int d;
+ 
+-    public PacketPlayOutScoreboardObjective() {}
++    public PacketPlayOutScoreboardObjective() {
++    }
+ 
+     public PacketPlayOutScoreboardObjective(ScoreboardObjective scoreboardobjective, int i) {
+         this.a = scoreboardobjective.getName();
+@@ -23,6 +25,13 @@ public class PacketPlayOutScoreboardObjective implements Packet<PacketListenerPl
+         this.d = i;
+     }
+ 
++    public PacketPlayOutScoreboardObjective(IScoreboardCriteria.EnumScoreboardHealthDisplay slot, String objectiveName, IChatBaseComponent displayName, int packetType) {
++        this.a = objectiveName;
++        this.b = displayName;
++        this.c = slot;
++        this.d = packetType;
++    }
++
+     @Override
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+         this.a = packetdataserializer.e(16);
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardTeam.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardTeam.java
+index c1bb5c325286119891e8d68ce8f7328c99edb486..b055865bb3413fa83839fadbba1af4aac8883f19 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardTeam.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutScoreboardTeam.java
+@@ -61,6 +61,19 @@ public class PacketPlayOutScoreboardTeam implements Packet<PacketListenerPlayOut
+ 
+     }
+ 
++    public PacketPlayOutScoreboardTeam(String teamName, int packetType, Collection<String> playerNames, IChatBaseComponent displayName, IChatBaseComponent prefix, IChatBaseComponent suffix, String nametagVisibility, String collisionRule, EnumChatFormat color, int options) {
++        this.a = teamName;
++        this.i = packetType;
++        this.h = playerNames;
++        this.b = displayName;
++        this.c = prefix;
++        this.d = suffix;
++        this.e = nametagVisibility;
++        this.f = collisionRule;
++        this.g = color;
++        this.j = options;
++    }
++
+     public PacketPlayOutScoreboardTeam(ScoreboardTeam scoreboardteam, Collection<String> collection, int i) {
+         this.b = ChatComponentText.d;
+         this.c = ChatComponentText.d;
+diff --git a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutSpawnEntity.java b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutSpawnEntity.java
+index 73cf8e774ae645cb731c23d28f6a153085e2ab7e..afd891db7973fc105f29737db6fdebc89c0e76a6 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutSpawnEntity.java
++++ b/src/main/java/net/minecraft/network/protocol/game/PacketPlayOutSpawnEntity.java
+@@ -1,7 +1,5 @@
+ package net.minecraft.network.protocol.game;
+ 
+-import java.io.IOException;
+-import java.util.UUID;
+ import net.minecraft.core.BlockPosition;
+ import net.minecraft.core.IRegistry;
+ import net.minecraft.network.PacketDataSerializer;
+@@ -10,6 +8,10 @@ import net.minecraft.util.MathHelper;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EntityTypes;
+ import net.minecraft.world.phys.Vec3D;
++import org.bukkit.Location;
++
++import java.io.IOException;
++import java.util.UUID;
+ 
+ public class PacketPlayOutSpawnEntity implements Packet<PacketListenerPlayOut> {
+ 
+@@ -26,7 +28,8 @@ public class PacketPlayOutSpawnEntity implements Packet<PacketListenerPlayOut> {
+     private EntityTypes<?> k;
+     private int l;
+ 
+-    public PacketPlayOutSpawnEntity() {}
++    public PacketPlayOutSpawnEntity() {
++    }
+ 
+     public PacketPlayOutSpawnEntity(int i, UUID uuid, double d0, double d1, double d2, float f, float f1, EntityTypes<?> entitytypes, int j, Vec3D vec3d) {
+         this.a = i;
+@@ -55,6 +58,19 @@ public class PacketPlayOutSpawnEntity implements Packet<PacketListenerPlayOut> {
+         this(entity.getId(), entity.getUniqueID(), (double) blockposition.getX(), (double) blockposition.getY(), (double) blockposition.getZ(), entity.pitch, entity.yaw, entitytypes, i, entity.getMot());
+     }
+ 
++    public PacketPlayOutSpawnEntity(int id, UUID uuid, Location location) {
++        this(id, uuid,
++                location.getX(),
++                location.getY(),
++                location.getZ(),
++                0.0F,
++                0.0F,
++                EntityTypes.ARMOR_STAND,
++                0,
++                Vec3D.ORIGIN
++        );
++    }
++
+     @Override
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+         this.a = packetdataserializer.i();
+@@ -75,7 +91,7 @@ public class PacketPlayOutSpawnEntity implements Packet<PacketListenerPlayOut> {
+     public void b(PacketDataSerializer packetdataserializer) throws IOException {
+         packetdataserializer.d(this.a);
+         packetdataserializer.a(this.b);
+-        packetdataserializer.d(IRegistry.ENTITY_TYPE.a((Object) this.k));
++        packetdataserializer.d(IRegistry.ENTITY_TYPE.a(this.k));
+         packetdataserializer.writeDouble(this.c);
+         packetdataserializer.writeDouble(this.d);
+         packetdataserializer.writeDouble(this.e);
+@@ -90,4 +106,9 @@ public class PacketPlayOutSpawnEntity implements Packet<PacketListenerPlayOut> {
+     public void a(PacketListenerPlayOut packetlistenerplayout) {
+         packetlistenerplayout.a(this);
+     }
++
++    public int getEntityId() {
++        return a;
++    }
++
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+index 9ecad2520740cc1c8f7017eaa935460777d0c191..087811c0ab5342e394f1226acc98ae84f8dfeaa5 100644
+--- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
++++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
+@@ -1,34 +1,15 @@
+ package org.bukkit.craftbukkit.entity;
+ 
++import com.destroystokyo.paper.ClientOption;
+ import com.destroystokyo.paper.ClientOption.ChatVisibility;
+ import com.destroystokyo.paper.PaperSkinParts;
+-import com.destroystokyo.paper.ClientOption;
+ import com.destroystokyo.paper.Title;
+ import com.google.common.base.Preconditions;
+ import com.google.common.collect.ImmutableSet;
+ import com.google.common.io.BaseEncoding;
+ import com.mojang.authlib.GameProfile;
+ import io.netty.buffer.Unpooled;
+-import java.io.ByteArrayOutputStream;
+-import java.io.IOException;
+-import java.lang.ref.WeakReference;
+-import java.net.InetSocketAddress;
+-import java.net.SocketAddress;
+-import java.util.ArrayList;
+-import java.util.Collection;
+-import java.util.Collections; // Paper
+-import java.util.HashMap;
+-import java.util.HashSet;
+-import java.util.LinkedHashMap;
+-import java.util.List;
+-import java.util.Map;
+-import java.util.Optional;
+-import java.util.Set;
+-import java.util.UUID;
+-import java.util.WeakHashMap;
+-import java.util.logging.Level;
+-import java.util.logging.Logger;
+-import javax.annotation.Nullable;
++import net.md_5.bungee.api.chat.BaseComponent;
+ import net.minecraft.SystemUtils;
+ import net.minecraft.advancements.AdvancementProgress;
+ import net.minecraft.core.BlockPosition;
+@@ -37,23 +18,8 @@ import net.minecraft.network.PacketDataSerializer;
+ import net.minecraft.network.chat.ChatComponentText;
+ import net.minecraft.network.chat.ChatMessageType;
+ import net.minecraft.network.chat.IChatBaseComponent;
+-import net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimation;
+-import net.minecraft.network.protocol.game.PacketPlayOutBlockChange;
+-import net.minecraft.network.protocol.game.PacketPlayOutChat;
+-import net.minecraft.network.protocol.game.PacketPlayOutCustomPayload;
+-import net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffect;
+-import net.minecraft.network.protocol.game.PacketPlayOutExperience;
+-import net.minecraft.network.protocol.game.PacketPlayOutMap;
+-import net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffect;
+-import net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo;
+-import net.minecraft.network.protocol.game.PacketPlayOutPlayerListHeaderFooter;
+-import net.minecraft.network.protocol.game.PacketPlayOutSpawnPosition;
+-import net.minecraft.network.protocol.game.PacketPlayOutStopSound;
+-import net.minecraft.network.protocol.game.PacketPlayOutTitle;
+-import net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributes;
+-import net.minecraft.network.protocol.game.PacketPlayOutUpdateHealth;
+-import net.minecraft.network.protocol.game.PacketPlayOutWorldEvent;
+-import net.minecraft.network.protocol.game.PacketPlayOutWorldParticles;
++import net.minecraft.network.protocol.Packet;
++import net.minecraft.network.protocol.game.*;
+ import net.minecraft.resources.MinecraftKey;
+ import net.minecraft.server.AdvancementDataPlayer;
+ import net.minecraft.server.level.EntityPlayer;
+@@ -84,33 +50,13 @@ import net.minecraft.world.level.saveddata.maps.MapIcon;
+ import net.minecraft.world.phys.Vec3D;
+ import org.apache.commons.lang.NotImplementedException;
+ import org.apache.commons.lang.Validate;
+-import org.bukkit.BanList;
+-import org.bukkit.Bukkit;
+-import org.bukkit.DyeColor;
+-import org.bukkit.Effect;
+-import org.bukkit.GameMode;
+-import org.bukkit.Instrument;
+-import org.bukkit.Location;
+-import org.bukkit.Material;
+-import org.bukkit.NamespacedKey;
+-import org.bukkit.Note;
+-import org.bukkit.OfflinePlayer;
+-import org.bukkit.Particle;
+-import org.bukkit.Sound;
+-import org.bukkit.Statistic;
+-import org.bukkit.WeatherType;
++import org.bukkit.*;
+ import org.bukkit.block.data.BlockData;
+ import org.bukkit.configuration.serialization.DelegateDeserialization;
+ import org.bukkit.conversations.Conversation;
+ import org.bukkit.conversations.ConversationAbandonedEvent;
+ import org.bukkit.conversations.ManuallyAbandonedConversationCanceller;
+-import org.bukkit.craftbukkit.CraftEffect;
+-import org.bukkit.craftbukkit.CraftOfflinePlayer;
+-import org.bukkit.craftbukkit.CraftParticle;
+-import org.bukkit.craftbukkit.CraftServer;
+-import org.bukkit.craftbukkit.CraftSound;
+-import org.bukkit.craftbukkit.CraftStatistic;
+-import org.bukkit.craftbukkit.CraftWorld;
++import org.bukkit.craftbukkit.*;
+ import org.bukkit.craftbukkit.advancement.CraftAdvancement;
+ import org.bukkit.craftbukkit.advancement.CraftAdvancementProgress;
+ import org.bukkit.craftbukkit.block.CraftSign;
+@@ -126,7 +72,6 @@ import org.bukkit.entity.EntityType;
+ import org.bukkit.entity.Player;
+ import org.bukkit.event.player.PlayerRegisterChannelEvent;
+ import org.bukkit.event.player.PlayerTeleportEvent;
+-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+ import org.bukkit.event.player.PlayerUnregisterChannelEvent;
+ import org.bukkit.inventory.InventoryView.Property;
+ import org.bukkit.inventory.ItemStack;
+@@ -136,8 +81,17 @@ import org.bukkit.metadata.MetadataValue;
+ import org.bukkit.plugin.Plugin;
+ import org.bukkit.plugin.messaging.StandardMessenger;
+ import org.bukkit.scoreboard.Scoreboard;
++import org.jetbrains.annotations.NotNull;
+ 
+-import net.md_5.bungee.api.chat.BaseComponent; // Spigot
++import javax.annotation.Nullable;
++import java.io.ByteArrayOutputStream;
++import java.io.IOException;
++import java.lang.ref.WeakReference;
++import java.net.InetSocketAddress;
++import java.net.SocketAddress;
++import java.util.*;
++import java.util.logging.Level;
++import java.util.logging.Logger;
+ 
+ @DelegateDeserialization(CraftOfflinePlayer.class)
+ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -157,7 +111,15 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     private String resourcePackHash;
+     private static final boolean DISABLE_CHANNEL_LIMIT = System.getProperty("paper.disableChannelLimit") != null; // Paper - add a flag to disable the channel limit
+     private long lastSaveTime;
++
+     // Paper end
++    @Override
++    public void sendPacket(@NotNull Object obj) {
++        if (obj instanceof Packet<?>) {
++            Packet packet = (Packet) obj;
++            getHandle().playerConnection.sendPacket(packet);
++        }
++    }
+ 
+     public CraftPlayer(CraftServer server, EntityPlayer entity) {
+         super(server, entity);
+@@ -294,21 +256,21 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     @Override
+     public void setPlayerListHeaderFooter(BaseComponent[] header, BaseComponent[] footer) {
+-         if (header != null) {
+-             String headerJson = net.md_5.bungee.chat.ComponentSerializer.toString(header);
+-             playerListHeader = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(headerJson);
+-         } else {
+-             playerListHeader = null;
+-         }
++        if (header != null) {
++            String headerJson = net.md_5.bungee.chat.ComponentSerializer.toString(header);
++            playerListHeader = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(headerJson);
++        } else {
++            playerListHeader = null;
++        }
+ 
+         if (footer != null) {
+-             String footerJson = net.md_5.bungee.chat.ComponentSerializer.toString(footer);
+-             playerListFooter = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(footerJson);
++            String footerJson = net.md_5.bungee.chat.ComponentSerializer.toString(footer);
++            playerListFooter = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserialize(footerJson);
+         } else {
+-             playerListFooter = null;
+-         }
++            playerListFooter = null;
++        }
+ 
+-         updatePlayerListHeaderFooter();
++        updatePlayerListHeaderFooter();
+     }
+ 
+     @Override
+@@ -383,7 +345,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     @Override
+     public String getDisplayName() {
+-        if(true) return io.papermc.paper.adventure.DisplayNames.getLegacy(this); // Paper
++        if (true) return io.papermc.paper.adventure.DisplayNames.getLegacy(this); // Paper
+         return getHandle().displayName;
+     }
+ 
+@@ -403,18 +365,22 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             }
+         }
+     }
++
+     @Override
+     public net.kyori.adventure.text.Component playerListName() {
+         return getHandle().listName == null ? net.kyori.adventure.text.Component.text(getName()) : io.papermc.paper.adventure.PaperAdventure.asAdventure(getHandle().listName);
+     }
++
+     @Override
+     public net.kyori.adventure.text.Component playerListHeader() {
+         return playerListHeader;
+     }
++
+     @Override
+     public net.kyori.adventure.text.Component playerListFooter() {
+         return playerListFooter;
+     }
++
+     // Paper end
+     @Override
+     public String getPlayerListName() {
+@@ -550,36 +516,36 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         String instrumentName = null;
+         switch (instrument) {
+-        case 0:
+-            instrumentName = "harp";
+-            break;
+-        case 1:
+-            instrumentName = "basedrum";
+-            break;
+-        case 2:
+-            instrumentName = "snare";
+-            break;
+-        case 3:
+-            instrumentName = "hat";
+-            break;
+-        case 4:
+-            instrumentName = "bass";
+-            break;
+-        case 5:
+-            instrumentName = "flute";
+-            break;
+-        case 6:
+-            instrumentName = "bell";
+-            break;
+-        case 7:
+-            instrumentName = "guitar";
+-            break;
+-        case 8:
+-            instrumentName = "chime";
+-            break;
+-        case 9:
+-            instrumentName = "xylophone";
+-            break;
++            case 0:
++                instrumentName = "harp";
++                break;
++            case 1:
++                instrumentName = "basedrum";
++                break;
++            case 2:
++                instrumentName = "snare";
++                break;
++            case 3:
++                instrumentName = "hat";
++                break;
++            case 4:
++                instrumentName = "bass";
++                break;
++            case 5:
++                instrumentName = "flute";
++                break;
++            case 6:
++                instrumentName = "bell";
++                break;
++            case 7:
++                instrumentName = "guitar";
++                break;
++            case 8:
++                instrumentName = "chime";
++                break;
++            case 9:
++                instrumentName = "xylophone";
++                break;
+         }
+ 
+         float f = (float) Math.pow(2.0D, (note - 12.0D) / 12.0D);
+@@ -750,6 +716,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     public void sendSignChange(Location loc, List<net.kyori.adventure.text.Component> lines) {
+         this.sendSignChange(loc, lines, org.bukkit.DyeColor.BLACK);
+     }
++
+     @Override
+     public void sendSignChange(Location loc, List<net.kyori.adventure.text.Component> lines, DyeColor dyeColor) {
+         if (getHandle().playerConnection == null) {
+@@ -775,10 +742,11 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         getHandle().playerConnection.sendPacket(sign.getUpdatePacket());
+     }
++
+     // Paper end
+     @Override
+     public void sendSignChange(Location loc, String[] lines) {
+-       sendSignChange(loc, lines, DyeColor.BLACK);
++        sendSignChange(loc, lines, DyeColor.BLACK);
+     }
+ 
+     @Override
+@@ -865,7 +833,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     // Paper start
+     @Override
+     public java.util.concurrent.CompletableFuture<Boolean> teleportAsync(Location loc, @javax.annotation.Nonnull PlayerTeleportEvent.TeleportCause cause) {
+-        ((CraftWorld)loc.getWorld()).getHandle().getChunkProvider().markAreaHighPriority(new ChunkCoordIntPair(MathHelper.floor(loc.getX()) >> 4, MathHelper.floor(loc.getZ()) >> 4), 28, 3); // Paper - load area high priority
++        ((CraftWorld) loc.getWorld()).getHandle().getChunkProvider().markAreaHighPriority(new ChunkCoordIntPair(MathHelper.floor(loc.getX()) >> 4, MathHelper.floor(loc.getZ()) >> 4), 28, 3); // Paper - load area high priority
+         return super.teleportAsync(loc, cause);
+     }
+     // Paper end
+@@ -883,7 +851,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         }
+ 
+         if (entity.playerConnection == null) {
+-           return false;
++            return false;
+         }
+ 
+         if (entity.isVehicle()) {
+@@ -1343,6 +1311,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         EntityPlayer other = ((CraftPlayer) player).getHandle();
+         unregisterPlayer(other);
+     }
++
+     private void unregisterPlayer(EntityPlayer other) {
+         PlayerChunkMap tracker = ((WorldServer) entity.world).getChunkProvider().playerChunkMap;
+         // Paper end
+@@ -1390,6 +1359,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         EntityPlayer other = ((CraftPlayer) player).getHandle();
+         registerPlayer(other);
+     }
++
+     private void registerPlayer(EntityPlayer other) {
+         PlayerChunkMap tracker = ((WorldServer) entity.world).getChunkProvider().playerChunkMap;
+         // Paper end
+@@ -1401,6 +1371,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             entry.updatePlayer(getHandle());
+         }
+     }
++
+     // Paper start
+     private void reregisterPlayer(EntityPlayer player) {
+         if (!hiddenPlayers.containsKey(player.getUniqueID())) {
+@@ -1408,6 +1379,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+             registerPlayer(player);
+         }
+     }
++
+     public void setPlayerProfile(com.destroystokyo.paper.profile.PlayerProfile profile) {
+         EntityPlayer self = getHandle();
+         self.setProfile(com.destroystokyo.paper.profile.CraftPlayerProfile.asAuthlibCopy(profile));
+@@ -1420,6 +1392,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         }
+         refreshPlayer();
+     }
++
+     public com.destroystokyo.paper.profile.PlayerProfile getPlayerProfile() {
+         return new com.destroystokyo.paper.profile.CraftPlayerProfile(this).clone();
+     }
+@@ -1869,7 +1842,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     }
+ 
+     public void setRealHealth(double health) {
+-        if (Double.isNaN(health)) {return;} // Paper
++        if (Double.isNaN(health)) {
++            return;
++        } // Paper
+         this.health = health;
+     }
+ 
+@@ -1917,13 +1892,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+                 break;
+             }
+         }
+-        AttributeModifiable dummy = new AttributeModifiable(GenericAttributes.MAX_HEALTH, (attribute) -> { });
++        AttributeModifiable dummy = new AttributeModifiable(GenericAttributes.MAX_HEALTH, (attribute) -> {
++        });
+         // Spigot start
+         double healthMod = scaledHealth ? healthScale : getMaxHealth();
+-        if ( healthMod >= Float.MAX_VALUE || healthMod <= 0 )
+-        {
++        if (healthMod >= Float.MAX_VALUE || healthMod <= 0) {
+             healthMod = 20; // Reset health
+-            getServer().getLogger().warning( getName() + " tried to crash the server with a large health attribute" );
++            getServer().getLogger().warning(getName() + " tried to crash the server with a large health attribute");
+         }
+         dummy.setValue(healthMod);
+         // Spigot end
+@@ -2055,6 +2030,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     public java.util.Locale locale() {
+         return getHandle().adventure$locale;
+     }
++
+     // Paper end
+     @Override
+     public int getPing() {
+@@ -2237,8 +2213,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     @Override
+     public void stopSound(final net.kyori.adventure.sound.SoundStop stop) {
+         this.getHandle().playerConnection.sendPacket(new PacketPlayOutStopSound(
+-            io.papermc.paper.adventure.PaperAdventure.asVanillaNullable(stop.sound()),
+-            io.papermc.paper.adventure.PaperAdventure.asVanillaNullable(stop.source())
++                io.papermc.paper.adventure.PaperAdventure.asVanillaNullable(stop.sound()),
++                io.papermc.paper.adventure.PaperAdventure.asVanillaNullable(stop.source())
+         ));
+     }
+ 
+@@ -2343,17 +2319,17 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+     @Override
+     public <T> T getClientOption(ClientOption<T> type) {
+-        if(ClientOption.SKIN_PARTS.equals(type)) {
++        if (ClientOption.SKIN_PARTS.equals(type)) {
+             return type.getType().cast(new PaperSkinParts(getHandle().getDataWatcher().get(EntityHuman.getSkinPartsWatcher())));
+-        } else if(ClientOption.CHAT_COLORS_ENABLED.equals(type)) {
++        } else if (ClientOption.CHAT_COLORS_ENABLED.equals(type)) {
+             return type.getType().cast(getHandle().hasChatColorsEnabled());
+-        } else if(ClientOption.CHAT_VISIBILITY.equals(type)) {
++        } else if (ClientOption.CHAT_VISIBILITY.equals(type)) {
+             return type.getType().cast(getHandle().getChatFlags() == null ? ChatVisibility.UNKNOWN : ChatVisibility.valueOf(getHandle().getChatFlags().name()));
+-        } else if(ClientOption.LOCALE.equals(type)) {
++        } else if (ClientOption.LOCALE.equals(type)) {
+             return type.getType().cast(getLocale());
+-        } else if(ClientOption.MAIN_HAND.equals(type)) {
++        } else if (ClientOption.MAIN_HAND.equals(type)) {
+             return type.getType().cast(getMainHand());
+-        } else if(ClientOption.VIEW_DISTANCE.equals(type)) {
++        } else if (ClientOption.VIEW_DISTANCE.equals(type)) {
+             return type.getType().cast(getClientViewDistance());
+         }
+         throw new RuntimeException("Unknown settings type");
+@@ -2369,8 +2345,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         World world = ((CraftWorld) getWorld()).getHandle();
+         EntityFireworks entity = new EntityFireworks(world, item, getHandle());
+         return world.addEntity(entity)
+-            ? (org.bukkit.entity.Firework) entity.getBukkitEntity()
+-            : null;
++                ? (org.bukkit.entity.Firework) entity.getBukkitEntity()
++                : null;
+     }
+ 
+     @Override
+@@ -2397,12 +2373,10 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     // Paper end
+ 
+     // Spigot start
+-    private final Player.Spigot spigot = new Player.Spigot()
+-    {
++    private final Player.Spigot spigot = new Player.Spigot() {
+ 
+         @Override
+-        public InetSocketAddress getRawAddress()
+-        {
++        public InetSocketAddress getRawAddress() {
+             return (InetSocketAddress) getHandle().playerConnection.networkManager.getRawAddress();
+         }
+ 
+@@ -2417,34 +2391,30 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+         }
+ 
+         @Override
+-        public void respawn()
+-        {
+-            if ( getHealth() <= 0 && isOnline() )
+-            {
+-                server.getServer().getPlayerList().moveToWorld( getHandle(), false );
++        public void respawn() {
++            if (getHealth() <= 0 && isOnline()) {
++                server.getServer().getPlayerList().moveToWorld(getHandle(), false);
+             }
+         }
+ 
+         @Override
+-        public Set<Player> getHiddenPlayers()
+-        {
++        public Set<Player> getHiddenPlayers() {
+             Set<Player> ret = new HashSet<Player>();
+-            for ( UUID u : hiddenPlayers.keySet() )
+-            {
+-                ret.add( getServer().getPlayer( u ) );
++            for (UUID u : hiddenPlayers.keySet()) {
++                ret.add(getServer().getPlayer(u));
+             }
+ 
+-            return java.util.Collections.unmodifiableSet( ret );
++            return java.util.Collections.unmodifiableSet(ret);
+         }
+ 
+         @Override
+         public void sendMessage(BaseComponent component) {
+-          sendMessage( new BaseComponent[] { component } );
++            sendMessage(new BaseComponent[]{component});
+         }
+ 
+         @Override
+         public void sendMessage(BaseComponent... components) {
+-           if ( getHandle().playerConnection == null ) return;
++            if (getHandle().playerConnection == null) return;
+ 
+             PacketPlayOutChat packet = new PacketPlayOutChat(null, net.minecraft.network.chat.ChatMessageType.SYSTEM, SystemUtils.b);
+             packet.components = components;
+@@ -2463,12 +2433,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         @Override
+         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent component) {
+-            sendMessage( position, new BaseComponent[] { component } );
++            sendMessage(position, new BaseComponent[]{component});
+         }
+ 
+         @Override
+         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent... components) {
+-            if ( getHandle().playerConnection == null ) return;
++            if (getHandle().playerConnection == null) return;
+ 
+             PacketPlayOutChat packet = new PacketPlayOutChat(null, net.minecraft.network.chat.ChatMessageType.a((byte) position.ordinal()), SystemUtils.b);
+             packet.components = components;
+@@ -2477,12 +2447,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         @Override
+         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent component) {
+-            sendMessage( position, sender, new BaseComponent[] { component } );
++            sendMessage(position, sender, new BaseComponent[]{component});
+         }
+ 
+         @Override
+         public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent... components) {
+-            if ( getHandle().playerConnection == null ) return;
++            if (getHandle().playerConnection == null) return;
+ 
+             PacketPlayOutChat packet = new PacketPlayOutChat(null, net.minecraft.network.chat.ChatMessageType.a((byte) position.ordinal()), sender == null ? SystemUtils.b : sender);
+             packet.components = components;
+@@ -2491,8 +2461,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+ 
+         // Paper start
+         @Override
+-        public int getPing()
+-        {
++        public int getPing() {
+             return getHandle().ping;
+         }
+         // Paper end
+@@ -2505,8 +2474,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+     }
+     // Paper end
+ 
+-    public Player.Spigot spigot()
+-    {
++    public Player.Spigot spigot() {
+         return spigot;
+     }
+     // Spigot end

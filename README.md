@@ -38,13 +38,6 @@ Latest build shortcut links:
 * [1.15](https://purpur.pl3x.net/api/v1/purpur/1.15/latest/download) builds 339-346
 * [1.14.x](https://purpur.pl3x.net/api/v1/purpur/1.14.4/latest/download) builds 337 and below
 
-
-Downloads API endpoints:
- * List versions of Minecraft with builds available: `https://purpur.pl3x.net/api/v1/purpur`
- * List builds for a version of Minecraft: `https://purpur.pl3x.net/api/v1/purpur/<version>`
- * Download a specific build of a specific version: `https://purpur.pl3x.net/api/v1/purpur/<version>/<build>/download`
- * Download the latest build for a version of Minecraft: `https://purpur.pl3x.net/api/v1/purpur/<version>/latest/download`
-
 ## License
 [![MIT License](https://img.shields.io/github/license/pl3xgaming/Purpur?&logo=github)](License)
 
@@ -65,14 +58,21 @@ See [PaperMC/Paper](https://github.com/PaperMC/Paper), [Tuinity/Tuinity](https:/
 Maven
 ```xml
 <repository>
-    <id>purpur</id>
-    <url>https://repo.pl3x.net/</url>
+    <id>mc-repository-private</id>
+    <url>https://repo.minecomplex.ru/private/</url>
 </repository>
 ```
 ```xml
 <dependency>
-    <groupId>net.pl3x.purpur</groupId>
+    <groupId>org.purpurmc.purpur</groupId>
     <artifactId>purpur-api</artifactId>
+    <version>1.16.5-R0.1-SNAPSHOT</version>
+    <scope>provided</scope>
+</dependency>
+
+<dependency>
+    <groupId>org.purpurmc.purpur</groupId>
+    <artifactId>purpur-server</artifactId>
     <version>1.16.5-R0.1-SNAPSHOT</version>
     <scope>provided</scope>
 </dependency>
@@ -81,13 +81,14 @@ Maven
 Gradle
 ```kotlin
 repositories {
-    maven("https://repo.pl3x.net/")
+    maven("https://repo.minecomplex.ru/private")
 }
 ```
 ```kotlin
 dependencies {
-    compileOnly("net.pl3x.purpur", "purpur-api", "1.16.5-R0.1-SNAPSHOT")
-}
+    compileOnly("org.purpurmc.purpur", "purpur-api", "1.16.5-R0.1-SNAPSHOT")
+    compileOnly("org.purpurmc.purpur", "purpur-server", "1.16.5-R0.1-SNAPSHOT")
+}}
 ```
 
 Yes, this also includes all API provided by Paper, Spigot, and Bukkit.

@@ -30,6 +30,11 @@ toothpick {
 }
 
 subprojects {
+    dependencies {
+        implementation("org.checkerframework:checker-qual:3.47.0")
+        implementation("org.checkerframework:checker:3.47.0")
+    }
+
     repositories {
         maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-snapshots/")
         maven("https://oss.sonatype.org/content/repositories/snapshots/") {
