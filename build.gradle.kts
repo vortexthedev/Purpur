@@ -41,6 +41,7 @@ subprojects {
 
     repositories {
         mavenCentral()
+        mavenLocal()
         maven(paperMavenPublicUrl)
         maven("https://jitpack.io")
     }

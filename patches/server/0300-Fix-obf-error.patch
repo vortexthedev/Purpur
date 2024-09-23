@@ -1,0 +1,37 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Tue, 24 Sep 2024 01:15:00 +0300
+Subject: [PATCH] Fix obf error
+
+
+diff --git a/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java b/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
+index b87069910c139e03d62bfd5d896127f216ce391e..230f1175e67858ac1a4fab49395102eb1ab9ddb6 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
++++ b/src/main/java/net/minecraft/network/protocol/game/ClientboundPlayerInfoUpdatePacket.java
+@@ -22,9 +22,12 @@ import net.minecraft.server.level.ServerPlayer;
+ import net.minecraft.world.level.GameType;
+ 
+ public class ClientboundPlayerInfoUpdatePacket implements Packet<ClientGamePacketListener> {
+-    public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundPlayerInfoUpdatePacket> STREAM_CODEC = Packet.codec(
++    private static final StreamCodec<RegistryFriendlyByteBuf, ClientboundPlayerInfoUpdatePacket> STREAM_CODEC = Packet.codec(
+         ClientboundPlayerInfoUpdatePacket::write, ClientboundPlayerInfoUpdatePacket::new
+     );
++    public static StreamCodec<RegistryFriendlyByteBuf, ClientboundPlayerInfoUpdatePacket> getStreamCodec() {
++        return STREAM_CODEC;
++    }
+     private final EnumSet<ClientboundPlayerInfoUpdatePacket.Action> actions;
+     private final List<ClientboundPlayerInfoUpdatePacket.Entry> entries;
+ 
+diff --git a/src/main/java/net/minecraft/network/protocol/game/GameProtocols.java b/src/main/java/net/minecraft/network/protocol/game/GameProtocols.java
+index a96ecf2ec4e577fef424c2815fcb05416c675cab..a3dcc1d2daf1c001f2d7c36810762ba8d5c1a5f4 100644
+--- a/src/main/java/net/minecraft/network/protocol/game/GameProtocols.java
++++ b/src/main/java/net/minecraft/network/protocol/game/GameProtocols.java
+@@ -152,7 +152,7 @@ public class GameProtocols {
+                 .addPacket(GamePacketTypes.CLIENTBOUND_PLAYER_COMBAT_ENTER, ClientboundPlayerCombatEnterPacket.STREAM_CODEC)
+                 .addPacket(GamePacketTypes.CLIENTBOUND_PLAYER_COMBAT_KILL, ClientboundPlayerCombatKillPacket.STREAM_CODEC)
+                 .addPacket(GamePacketTypes.CLIENTBOUND_PLAYER_INFO_REMOVE, ClientboundPlayerInfoRemovePacket.STREAM_CODEC)
+-                .addPacket(GamePacketTypes.CLIENTBOUND_PLAYER_INFO_UPDATE, ClientboundPlayerInfoUpdatePacket.STREAM_CODEC)
++                .addPacket(GamePacketTypes.CLIENTBOUND_PLAYER_INFO_UPDATE, ClientboundPlayerInfoUpdatePacket.getStreamCodec())
+                 .addPacket(GamePacketTypes.CLIENTBOUND_PLAYER_LOOK_AT, ClientboundPlayerLookAtPacket.STREAM_CODEC)
+                 .addPacket(GamePacketTypes.CLIENTBOUND_PLAYER_POSITION, ClientboundPlayerPositionPacket.STREAM_CODEC)
+                 .addPacket(GamePacketTypes.CLIENTBOUND_RECIPE, ClientboundRecipePacket.STREAM_CODEC)
