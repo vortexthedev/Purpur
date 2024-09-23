@@ -5,7 +5,7 @@ Subject: [PATCH] Bson annotations
 
 
 diff --git a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
-index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e3dc48a41 100644
+index 5113926a31947e80777e9b6d008a2a3264af7ae5..1ae0702c8f3bc89c961e631a3c3a4ea9fc4ba394 100644
 --- a/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 +++ b/src/main/java/org/bukkit/craftbukkit/entity/CraftPlayer.java
 @@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableSet;
@@ -74,7 +74,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      private long firstPlayed = 0;
      private long lastPlayed = 0;
      private boolean hasPlayedBefore = false;
-@@ -386,27 +385,27 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -392,27 +391,27 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public void setPlayerListHeaderFooter(BaseComponent[] header, BaseComponent[] footer) {
@@ -114,7 +114,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      }
  
  
-@@ -479,7 +478,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -485,7 +484,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public String getDisplayName() {
@@ -123,7 +123,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          return this.getHandle().displayName;
      }
  
-@@ -499,18 +498,22 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -505,18 +504,22 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              }
          }
      }
@@ -146,7 +146,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      // Paper end
      @Override
      public String getPlayerListName() {
-@@ -522,6 +525,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -528,6 +531,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          // Purpur start
          setPlayerListName(name, false);
      }
@@ -154,7 +154,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      public void setPlayerListName(String name, boolean useMM) {
          // Purpur end
          if (name == null) {
-@@ -604,6 +608,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -610,6 +614,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      // Paper start
      private static final net.kyori.adventure.text.Component DEFAULT_KICK_COMPONENT = net.kyori.adventure.text.Component.translatable("multiplayer.disconnect.kicked");
@@ -162,7 +162,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      @Override
      public void kick() {
          this.kick(DEFAULT_KICK_COMPONENT);
-@@ -804,14 +809,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -810,14 +815,16 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public void playSound(org.bukkit.entity.Entity entity, Sound sound, org.bukkit.SoundCategory category, float volume, float pitch, long seed) {
@@ -181,7 +181,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
  
          this.playSound0(entity, Holder.direct(SoundEvent.createVariableRangeEvent(new ResourceLocation(sound))), net.minecraft.sounds.SoundSource.valueOf(category.name()), volume, pitch, seed);
      }
-@@ -977,7 +984,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -983,7 +990,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          this.sendBlockChanges(blocks);
      }
  
@@ -191,7 +191,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
  
          public ChunkSectionChanges() {
              this(new ShortArraySet(), new ArrayList<>());
-@@ -1028,6 +1036,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1034,6 +1042,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          Component[] components = CraftSign.sanitizeLines(lines);
          this.sendSignChange0(components, loc, dyeColor, hasGlowingText);
      }
@@ -199,7 +199,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      // Paper end
      @Override
      public void sendSignChange(Location loc, String[] lines) {
-@@ -1171,10 +1180,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1177,10 +1186,12 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              }
  
              @Override
@@ -214,7 +214,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          };
      }
  
-@@ -1359,7 +1370,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1365,7 +1376,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          }
  
          if (entity.connection == null) {
@@ -223,7 +223,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          }
  
          if (entity.isVehicle() && !ignorePassengers) { // Paper - Teleport API
-@@ -1902,6 +1913,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1908,6 +1919,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
          server.getPluginManager().callEvent(new PlayerHideEntityEvent(this, entity));
      }
@@ -231,7 +231,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      private void unregisterEntity(Entity other) {
          // Paper end
          ChunkMap tracker = ((ServerLevel) this.getHandle().level()).getChunkSource().chunkMap;
-@@ -1984,6 +1996,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -1990,6 +2002,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          // Paper start - uuid override
          this.trackAndShowEntity(entity, null);
      }
@@ -239,7 +239,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      private void trackAndShowEntity(org.bukkit.entity.Entity entity, final @Nullable UUID uuidOverride) {
          // Paper end
          ChunkMap tracker = ((ServerLevel) this.getHandle().level()).getChunkSource().chunkMap;
-@@ -2009,6 +2022,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2015,6 +2028,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
          this.server.getPluginManager().callEvent(new PlayerShowEntityEvent(this, entity));
      }
@@ -247,7 +247,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      // Paper start
      @Override
      public void setPlayerProfile(com.destroystokyo.paper.profile.PlayerProfile profile) {
-@@ -2053,6 +2067,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2059,6 +2073,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              this.trackAndShowEntity(entity);
          }
      }
@@ -255,7 +255,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      // Paper start
      public com.destroystokyo.paper.profile.PlayerProfile getPlayerProfile() {
          return new com.destroystokyo.paper.profile.CraftPlayerProfile(this).clone();
-@@ -2615,7 +2630,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2621,7 +2636,9 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      }
  
      public void setRealHealth(double health) {
@@ -266,7 +266,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          this.health = health;
      }
  
-@@ -2669,13 +2686,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2675,13 +2692,13 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
                  break;
              }
          }
@@ -284,7 +284,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          }
          dummy.setBaseValue(healthMod);
          // Spigot end
-@@ -2809,6 +2826,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2815,6 +2832,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      public java.util.Locale locale() {
          return getHandle().adventure$locale;
      }
@@ -292,7 +292,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      // Paper end
      @Override
      public int getPing() {
-@@ -2848,8 +2866,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -2854,8 +2872,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
          Preconditions.checkArgument(url != null, "Resource pack URL cannot be null");
          Preconditions.checkArgument(hash != null, "Hash cannot be null");
          net.minecraft.network.chat.Component promptComponent = resourcePackPrompt != null ?
@@ -303,7 +303,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          this.getHandle().connection.send(new ClientboundResourcePackPacket(url, hash, required, promptComponent));
      }
  
-@@ -3182,49 +3200,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3188,49 +3206,43 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
              super.remove();
          }
      }
@@ -366,7 +366,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          }
  
          @Override
-@@ -3239,7 +3251,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3245,7 +3257,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
          @Override
          public void sendMessage(net.md_5.bungee.api.ChatMessageType position, BaseComponent component) {
@@ -375,7 +375,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          }
  
          @Override
-@@ -3249,20 +3261,19 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3255,20 +3267,19 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
          @Override
          public void sendMessage(net.md_5.bungee.api.ChatMessageType position, UUID sender, BaseComponent component) {
@@ -399,7 +399,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
              return CraftPlayer.this.getPing();
          }
          // Paper end
-@@ -3278,7 +3289,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3284,7 +3295,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      // Paper start
      @Override
      public void showElderGuardian(boolean silent) {
@@ -409,7 +409,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
      }
  
      @Override
-@@ -3329,8 +3341,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3335,8 +3347,7 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
      }
      // Paper end
  
@@ -419,7 +419,7 @@ index 3b3bbeda831f82b6d9b284d85a31a1fff578a64f..30a98f6c5e83b49fcb0830d59459ab3e
          return this.spigot;
      }
      // Spigot end
-@@ -3384,7 +3395,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
+@@ -3390,7 +3401,8 @@ public class CraftPlayer extends CraftHumanEntity implements Player {
  
      @Override
      public void sendBlockHighlight(Location location, int duration, String text, org.bukkit.Color color, int transparency) {
