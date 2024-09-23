@@ -1,5 +1,4 @@
 import xyz.jpenilla.toothpick.setupToothpickProject
-import java.util.Locale
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
@@ -16,5 +15,5 @@ plugins {
 }
 
 val forkName = "Purpur"
-rootProject.name = forkName.toLowerCase(Locale.ROOT)
+rootProject.name = forkName
 setupToothpickProject(rootProject, forkName)

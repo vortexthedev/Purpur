@@ -6,8 +6,8 @@ plugins {
 
 toothpick {
     forkName = "Purpur"
-    groupId = "net.pl3x.purpur"
-    forkUrl = "https://github.com/pl3xgaming/Purpur"
+    groupId = "org.purpurmc.purpur"
+    forkUrl = "https://github.com/PurpurMC/Purpur"
     val versionTag = System.getenv("BUILD_NUMBER")
         ?: "\"${commitHash() ?: error("Could not obtain git hash")}\""
     forkVersion = "git-$forkName-$versionTag"
@@ -35,15 +35,16 @@ subprojects {
         maven("https://oss.sonatype.org/content/repositories/snapshots/") {
             name = "sonatype-oss-snapshots"
         }
+        mavenLocal()
     }
 
     java {
-        sourceCompatibility = JavaVersion.toVersion(8)
-        targetCompatibility = JavaVersion.toVersion(8)
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    publishing.repositories.maven {
-        url = uri("https://repo.pl3x.net/snapshots")
+    publishing.repositories.maven("https://repo.purpurmc.org/snapshots") {
+        name = "purpur"
         credentials(PasswordCredentials::class)
     }
 }
