@@ -1,0 +1,27 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Wed, 25 Sep 2024 01:49:35 +0300
+Subject: [PATCH] Fix yaml update
+
+
+diff --git a/src/main/java/org/bukkit/plugin/PluginDescriptionFile.java b/src/main/java/org/bukkit/plugin/PluginDescriptionFile.java
+index 801a323d9c328c1ab8e58c651cea9c5f3dfbcdca..053993e562a0f449654e345f01bc8138ed60ad2c 100644
+--- a/src/main/java/org/bukkit/plugin/PluginDescriptionFile.java
++++ b/src/main/java/org/bukkit/plugin/PluginDescriptionFile.java
+@@ -23,6 +23,7 @@ import org.bukkit.permissions.PermissionDefault;
+ import org.bukkit.plugin.java.JavaPlugin;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
++import org.yaml.snakeyaml.LoaderOptions;
+ import org.yaml.snakeyaml.Yaml;
+ import org.yaml.snakeyaml.constructor.AbstractConstruct;
+ import org.yaml.snakeyaml.constructor.SafeConstructor;
+@@ -200,7 +201,7 @@ public final class PluginDescriptionFile {
+         @Override
+         @NotNull
+         protected Yaml initialValue() {
+-            return new Yaml(new SafeConstructor() {
++            return new Yaml(new SafeConstructor(new LoaderOptions()) {
+                 {
+                     yamlConstructors.put(null, new AbstractConstruct() {
+                         @NotNull
