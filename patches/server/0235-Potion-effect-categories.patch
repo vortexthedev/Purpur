@@ -45,7 +45,7 @@ index bc11c564d7dfa64c6c9dc44140b97642a33685a2..b4b628b1661f61797a911f29126edabb
          return Color.fromRGB(handle.getColor());
 diff --git a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectTypeCategory.java b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectTypeCategory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..70c3831723c8550e796ecbf68e9b1749498737d0
+index 0000000000000000000000000000000000000000..b5377db7e81db2d70cd6037ab2a7b5daa6f3b3fc
 --- /dev/null
 +++ b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectTypeCategory.java
 @@ -0,0 +1,18 @@

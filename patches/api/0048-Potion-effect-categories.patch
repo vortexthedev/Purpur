@@ -55,7 +55,7 @@ index b5790aaac67f5b73f941147008d21a92d716b254..7e52cb03e0b2327fc1b141e2925c13e2
       *
 diff --git a/src/main/java/org/bukkit/potion/PotionEffectTypeCategory.java b/src/main/java/org/bukkit/potion/PotionEffectTypeCategory.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..77c301d2e15174a45b38efb7a9511b5a39e02771
+index 0000000000000000000000000000000000000000..15a55a574ca15d036d5e8c3cea42836c41115134
 --- /dev/null
 +++ b/src/main/java/org/bukkit/potion/PotionEffectTypeCategory.java
 @@ -0,0 +1,24 @@

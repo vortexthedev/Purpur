@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Thu, 26 Sep 2024 01:25:22 +0300
+Subject: [PATCH] Potion effect categories
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectType.java b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectType.java
+index b4b628b1661f61797a911f29126edabbc2bc8917..1adf0c200146d98c03564e30bcd9d854474b5d18 100644
+--- a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectType.java
++++ b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectType.java
+@@ -4,6 +4,7 @@ import net.minecraft.world.effect.MobEffectList;
+ import org.bukkit.Color;
+ import org.bukkit.potion.PotionEffectType;
+ import org.bukkit.potion.PotionEffectTypeCategory;
++import org.jetbrains.annotations.NotNull;
+ 
+ public class CraftPotionEffectType extends PotionEffectType {
+     private final MobEffectList handle;
+@@ -108,4 +109,17 @@ public class CraftPotionEffectType extends PotionEffectType {
+     public Color getColor() {
+         return Color.fromRGB(handle.getColor());
+     }
++
++    @Override
++    public PotionEffectType.Category getEffectCategory() {
++        return fromNMS(handle.getCategory());
++    }
++
++    public static PotionEffectType.Category fromNMS(net.minecraft.world.effect.MobEffectInfo mobEffectInfo) {
++        return switch (mobEffectInfo) {
++            case BENEFICIAL -> PotionEffectType.Category.BENEFICIAL;
++            case HARMFUL -> PotionEffectType.Category.HARMFUL;
++            case NEUTRAL -> PotionEffectType.Category.NEUTRAL;
++        };
++    }
+ }
