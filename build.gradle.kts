@@ -4,11 +4,6 @@ plugins {
     id("xyz.jpenilla.toothpick")
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
-}
-
 toothpick {
     forkName = "Purpur"
     groupId = "org.purpurmc.purpur"
@@ -36,8 +31,8 @@ toothpick {
 
 subprojects {
     java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     repositories {
