@@ -1,0 +1,85 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Thu, 26 Sep 2024 01:09:40 +0300
+Subject: [PATCH] Potion effect categories
+
+
+diff --git a/src/main/java/org/bukkit/potion/PotionEffect.java b/src/main/java/org/bukkit/potion/PotionEffect.java
+index 74767751199bce03d63f2a9524712656193f850c..913417fcf9bc007c0496e0c22d100f791fcdad4e 100644
+--- a/src/main/java/org/bukkit/potion/PotionEffect.java
++++ b/src/main/java/org/bukkit/potion/PotionEffect.java
+@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
+  */
+ @SerializableAs("PotionEffect")
+ public class PotionEffect implements ConfigurationSerializable {
++    public static final int INFINITE_DURATION = -1;
+     private static final String AMPLIFIER = "amplifier";
+     private static final String DURATION = "duration";
+     private static final String TYPE = "effect";
+@@ -167,6 +168,17 @@ public class PotionEffect implements ConfigurationSerializable {
+             .build();
+     }
+ 
++    /**
++     * Returns whether or not this potion effect has an infinite duration. Potion
++     * effects with infinite durations will display an infinite symbol and never
++     * expire unless manually removed.
++     *
++     * @return whether this duration is infinite or not
++     */
++    public boolean isInfinite() {
++        return duration == INFINITE_DURATION;
++    }
++
+     /**
+      * Attempts to add the effect represented by this object to the given
+      * {@link LivingEntity}.
+diff --git a/src/main/java/org/bukkit/potion/PotionEffectType.java b/src/main/java/org/bukkit/potion/PotionEffectType.java
+index b5790aaac67f5b73f941147008d21a92d716b254..7e52cb03e0b2327fc1b141e2925c13e209aa4e2b 100644
+--- a/src/main/java/org/bukkit/potion/PotionEffectType.java
++++ b/src/main/java/org/bukkit/potion/PotionEffectType.java
+@@ -229,6 +229,14 @@ public abstract class PotionEffectType {
+      */
+     public abstract boolean isInstant();
+ 
++    /**
++     * Returns the {@link PotionEffectTypeCategory category} of this effect type.
++     *
++     * @return the category
++     */
++    @NotNull
++    public abstract PotionEffectTypeCategory getCategory();
++
+     /**
+      * Returns the color of this effect type.
+      *
+diff --git a/src/main/java/org/bukkit/potion/PotionEffectTypeCategory.java b/src/main/java/org/bukkit/potion/PotionEffectTypeCategory.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..77c301d2e15174a45b38efb7a9511b5a39e02771
+--- /dev/null
++++ b/src/main/java/org/bukkit/potion/PotionEffectTypeCategory.java
+@@ -0,0 +1,24 @@
++package org.bukkit.potion;
++
++/**
++ * Represents a category of {@link PotionEffectType} and its effect on an entity.
++ */
++public enum PotionEffectTypeCategory {
++
++    /**
++     * Beneficial effects that positively impact an entity, such as Regeneration,
++     * Absorption, or Fire Resistance.
++     */
++    BENEFICIAL,
++    /**
++     * Harmful effects that negatively impact an entity, such as Blindness, Wither,
++     * or Levitation.
++     */
++    HARMFUL,
++    /**
++     * Neutral effects that have neither a positive nor negative effect on an
++     * entity, such as Glowing or Bad Omen.
++     */
++    NEUTRAL;
++
++}

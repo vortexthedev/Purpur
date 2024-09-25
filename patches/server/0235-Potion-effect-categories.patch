@@ -1,0 +1,69 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Thu, 26 Sep 2024 01:09:38 +0300
+Subject: [PATCH] Potion effect categories
+
+
+diff --git a/src/main/java/net/minecraft/world/effect/MobEffectList.java b/src/main/java/net/minecraft/world/effect/MobEffectList.java
+index f0348960e17056ea9dad0f08fe010a7c69123094..acffb9d03d0e3c036b429ea54f7b9fdcf0449e7e 100644
+--- a/src/main/java/net/minecraft/world/effect/MobEffectList.java
++++ b/src/main/java/net/minecraft/world/effect/MobEffectList.java
+@@ -128,6 +128,10 @@ public class MobEffectList {
+         return false;
+     }
+ 
++    public MobEffectInfo getCategory() {
++        return this.b;
++    }
++
+     protected String b() {
+         if (this.d == null) {
+             this.d = SystemUtils.a("effect", IRegistry.MOB_EFFECT.getKey(this));
+diff --git a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectType.java b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectType.java
+index bc11c564d7dfa64c6c9dc44140b97642a33685a2..b4b628b1661f61797a911f29126edabbc2bc8917 100644
+--- a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectType.java
++++ b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectType.java
+@@ -3,6 +3,7 @@ package org.bukkit.craftbukkit.potion;
+ import net.minecraft.world.effect.MobEffectList;
+ import org.bukkit.Color;
+ import org.bukkit.potion.PotionEffectType;
++import org.bukkit.potion.PotionEffectTypeCategory;
+ 
+ public class CraftPotionEffectType extends PotionEffectType {
+     private final MobEffectList handle;
+@@ -98,6 +99,11 @@ public class CraftPotionEffectType extends PotionEffectType {
+         return handle.isInstant();
+     }
+ 
++    @Override
++    public PotionEffectTypeCategory getCategory() {
++        return CraftPotionEffectTypeCategory.minecraftToBukkit(this.handle.getCategory());
++    }
++
+     @Override
+     public Color getColor() {
+         return Color.fromRGB(handle.getColor());
+diff --git a/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectTypeCategory.java b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectTypeCategory.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..70c3831723c8550e796ecbf68e9b1749498737d0
+--- /dev/null
++++ b/src/main/java/org/bukkit/craftbukkit/potion/CraftPotionEffectTypeCategory.java
+@@ -0,0 +1,18 @@
++package org.bukkit.craftbukkit.potion;
++
++import com.google.common.base.Preconditions;
++import net.minecraft.world.effect.MobEffectInfo;
++import org.bukkit.potion.PotionEffectTypeCategory;
++
++public final class CraftPotionEffectTypeCategory {
++
++    public static PotionEffectTypeCategory minecraftToBukkit(MobEffectInfo minecraft) {
++        Preconditions.checkArgument(minecraft != null);
++        return PotionEffectTypeCategory.valueOf(minecraft.name());
++    }
++
++    public static MobEffectInfo bukkitToMinecraft(PotionEffectTypeCategory bukkit) {
++        Preconditions.checkArgument(bukkit != null);
++        return MobEffectInfo.valueOf(bukkit.name());
++    }
++}
