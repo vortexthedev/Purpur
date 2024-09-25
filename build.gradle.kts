@@ -35,11 +35,6 @@ toothpick {
 }
 
 subprojects {
-    dependencies {
-        implementation("org.checkerframework:checker-qual:3.47.0")
-        implementation("org.checkerframework:checker:3.47.0")
-    }
-
     java {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
