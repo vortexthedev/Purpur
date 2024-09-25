@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Wed, 25 Sep 2024 02:49:31 +0300
+Subject: [PATCH] Java 21
+
+
+diff --git a/pom.xml b/pom.xml
+index a21e6cdd3799dda48b573c40ed76896ff6e4bd10..d59da8877b15707847d79f3b2c3fb2c02e4c4f2f 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -14,6 +14,7 @@
+         <bt.name>git</bt.name>
+         <minecraft.version>1.16.5</minecraft.version>
+         <minecraft_version>1_16_R3</minecraft_version>
++        <java.version>21</java.version>
+         <maven.compiler.source>21</maven.compiler.source>
+         <maven.compiler.target>21</maven.compiler.target>
+     </properties>

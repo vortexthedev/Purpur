@@ -1,0 +1,18 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Wed, 25 Sep 2024 02:49:32 +0300
+Subject: [PATCH] Java 21
+
+
+diff --git a/pom.xml b/pom.xml
+index 9ec78eca9d212a4dab18b658ab332799b480de85..b00afe47d9d6e1b4c8ca5fa37e4c2a1106030c2f 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -19,6 +19,7 @@
+ 
+     <properties>
+         <!-- <skipTests>true</skipTests> Paper - This [was] not going to end well -->
++        <java.version>21</java.version>
+         <maven.compiler.source>21</maven.compiler.source>
+         <maven.compiler.target>21</maven.compiler.target>
+         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

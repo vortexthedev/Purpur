@@ -1,0 +1,21 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Wed, 25 Sep 2024 02:56:03 +0300
+Subject: [PATCH] Java 21
+
+
+diff --git a/pom.xml b/pom.xml
+index d59da8877b15707847d79f3b2c3fb2c02e4c4f2f..d7ae9e70801d555ff7e5120ef455da84350e5b43 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -406,6 +406,10 @@
+                         <version>1.4.33-SNAPSHOT</version>
+                     </dependency>
+                 </dependencies>
++                <configuration>
++                    <source>${java.version}</source>
++                    <target>${java.version}</target>
++                </configuration>
+             </plugin>
+             <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
