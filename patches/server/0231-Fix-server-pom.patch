@@ -5,10 +5,10 @@ Subject: [PATCH] Fix server pom
 
 
 diff --git a/pom.xml b/pom.xml
-index 2b7d87f9c14b8645a5a9bcf9e4696e9fc711cac6..c8e247e225276b8ab8f240c32a6016da63d45b11 100644
+index 3ef0a08b7a38040e43670d18dc6c5542f9fbb9bb..f6c3c5dd0b4467ebd0cb78ef52a72dfc8091d105 100644
 --- a/pom.xml
 +++ b/pom.xml
-@@ -41,7 +41,7 @@
+@@ -40,7 +40,7 @@
      <dependencies>
          <dependency>
              <!-- Purpur start - our "upstream" is Paper (not Tuinity), so this is necessary for DependencyLoading.kt to work properly -->
