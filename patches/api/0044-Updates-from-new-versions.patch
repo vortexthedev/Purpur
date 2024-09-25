@@ -6,7 +6,7 @@ Subject: [PATCH] Updates from new versions
 
 diff --git a/src/main/java/io/papermc/paper/event/player/PlayerTrackEntityEvent.java b/src/main/java/io/papermc/paper/event/player/PlayerTrackEntityEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..2d573056a30908f8af0f88d14e39157b455ad800
+index 0000000000000000000000000000000000000000..356f8933a7715b4fc123e3a4879bb2cd085835c5
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/event/player/PlayerTrackEntityEvent.java
 @@ -0,0 +1,62 @@
@@ -74,7 +74,7 @@ index 0000000000000000000000000000000000000000..2d573056a30908f8af0f88d14e39157b
 +}
 diff --git a/src/main/java/io/papermc/paper/event/player/PlayerUntrackEntityEvent.java b/src/main/java/io/papermc/paper/event/player/PlayerUntrackEntityEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..12b4c90c00368d1223c88f02105187be22d981fa
+index 0000000000000000000000000000000000000000..c573eeaeb599ca717b09f9fd3f106a4800e9c386
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/event/player/PlayerUntrackEntityEvent.java
 @@ -0,0 +1,48 @@
@@ -128,7 +128,7 @@ index 0000000000000000000000000000000000000000..12b4c90c00368d1223c88f02105187be
 +}
 diff --git a/src/main/java/io/papermc/paper/event/server/WhitelistStateUpdateEvent.java b/src/main/java/io/papermc/paper/event/server/WhitelistStateUpdateEvent.java
 new file mode 100644
-index 0000000000000000000000000000000000000000..b63d5c9567319b38778e2ddc19ec8a91b4b33bb6
+index 0000000000000000000000000000000000000000..2f4273d694278517e2613f0da5e89c73ccc8779f
 --- /dev/null
 +++ b/src/main/java/io/papermc/paper/event/server/WhitelistStateUpdateEvent.java
 @@ -0,0 +1,87 @@
