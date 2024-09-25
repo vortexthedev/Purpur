@@ -1,0 +1,331 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Wed, 25 Sep 2024 15:07:18 +0300
+Subject: [PATCH] Updates from new versions
+
+
+diff --git a/src/main/java/io/papermc/paper/event/player/PlayerTrackEntityEvent.java b/src/main/java/io/papermc/paper/event/player/PlayerTrackEntityEvent.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..2d573056a30908f8af0f88d14e39157b455ad800
+--- /dev/null
++++ b/src/main/java/io/papermc/paper/event/player/PlayerTrackEntityEvent.java
+@@ -0,0 +1,62 @@
++package io.papermc.paper.event.player;
++
++import org.bukkit.entity.Entity;
++import org.bukkit.entity.Player;
++import org.bukkit.event.Cancellable;
++import org.bukkit.event.HandlerList;
++import org.bukkit.event.player.PlayerEvent;
++import org.jetbrains.annotations.ApiStatus;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * Is called when a {@link Player} tracks an {@link Entity}.
++ * <p>
++ * If cancelled entity is not shown to the player and interaction in both directions is not possible.
++ * <p>
++ * Adding or removing entities from the world at the point in time this event is called is completely
++ * unsupported and should be avoided.
++ */
++public class PlayerTrackEntityEvent extends PlayerEvent implements Cancellable {
++
++    private static final HandlerList HANDLER_LIST = new HandlerList();
++
++    private final Entity entity;
++    private boolean cancelled;
++
++    @ApiStatus.Internal
++    public PlayerTrackEntityEvent(@NotNull Player player, @NotNull Entity entity) {
++        super(player);
++        this.entity = entity;
++    }
++
++    /**
++     * Gets the entity that will be tracked
++     *
++     * @return the entity tracked
++     */
++    @NotNull
++    public Entity getEntity() {
++        return this.entity;
++    }
++
++    @Override
++    public boolean isCancelled() {
++        return this.cancelled;
++    }
++
++    @Override
++    public void setCancelled(boolean cancel) {
++        this.cancelled = cancel;
++    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return HANDLER_LIST;
++    }
++
++    @NotNull
++    @Override
++    public HandlerList getHandlers() {
++        return HANDLER_LIST;
++    }
++}
+diff --git a/src/main/java/io/papermc/paper/event/player/PlayerUntrackEntityEvent.java b/src/main/java/io/papermc/paper/event/player/PlayerUntrackEntityEvent.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..12b4c90c00368d1223c88f02105187be22d981fa
+--- /dev/null
++++ b/src/main/java/io/papermc/paper/event/player/PlayerUntrackEntityEvent.java
+@@ -0,0 +1,48 @@
++package io.papermc.paper.event.player;
++
++import org.bukkit.entity.Entity;
++import org.bukkit.entity.Player;
++import org.bukkit.event.HandlerList;
++import org.bukkit.event.player.PlayerEvent;
++import org.jetbrains.annotations.ApiStatus;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * Is called when a {@link Player} untracks an {@link Entity}.
++ * <p>
++ * Adding or removing entities from the world at the point in time this event is called is completely
++ * unsupported and should be avoided.
++ */
++public class PlayerUntrackEntityEvent extends PlayerEvent {
++
++    private static final HandlerList HANDLER_LIST = new HandlerList();
++
++    private final Entity entity;
++
++    @ApiStatus.Internal
++    public PlayerUntrackEntityEvent(@NotNull Player player, @NotNull Entity entity) {
++        super(player);
++        this.entity = entity;
++    }
++
++    /**
++     * Gets the entity that will be untracked
++     *
++     * @return the entity untracked
++     */
++    @NotNull
++    public Entity getEntity() {
++        return this.entity;
++    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return HANDLER_LIST;
++    }
++
++    @NotNull
++    @Override
++    public HandlerList getHandlers() {
++        return HANDLER_LIST;
++    }
++}
+diff --git a/src/main/java/io/papermc/paper/event/server/WhitelistStateUpdateEvent.java b/src/main/java/io/papermc/paper/event/server/WhitelistStateUpdateEvent.java
+new file mode 100644
+index 0000000000000000000000000000000000000000..b63d5c9567319b38778e2ddc19ec8a91b4b33bb6
+--- /dev/null
++++ b/src/main/java/io/papermc/paper/event/server/WhitelistStateUpdateEvent.java
+@@ -0,0 +1,87 @@
++package io.papermc.paper.event.server;
++
++import com.destroystokyo.paper.profile.PlayerProfile;
++import org.bukkit.Bukkit;
++import org.bukkit.OfflinePlayer;
++import org.bukkit.event.Cancellable;
++import org.bukkit.event.Event;
++import org.bukkit.event.HandlerList;
++import org.jetbrains.annotations.ApiStatus;
++import org.jetbrains.annotations.NotNull;
++
++/**
++ * This event gets called when the whitelist status of a player is changed
++ */
++public class WhitelistStateUpdateEvent extends Event implements Cancellable {
++
++    private static final HandlerList HANDLER_LIST = new HandlerList();
++
++    @NotNull private final PlayerProfile playerProfile;
++    @NotNull private final WhitelistStatus status;
++
++    private boolean cancelled;
++
++    @ApiStatus.Internal
++    public WhitelistStateUpdateEvent(@NotNull PlayerProfile playerProfile, @NotNull WhitelistStatus status) {
++        this.playerProfile = playerProfile;
++        this.status = status;
++    }
++
++    /**
++     * Gets the player whose whitelist status is being changed
++     *
++     * @return the player whose status is being changed
++     */
++    @NotNull
++    public OfflinePlayer getPlayer() {
++        return Bukkit.getOfflinePlayer(this.playerProfile.getId());
++    }
++
++    /**
++     * Gets the player profile whose whitelist status is being changed
++     *
++     * @return the player profile whose status is being changed
++     */
++    @NotNull
++    public PlayerProfile getPlayerProfile() {
++        return this.playerProfile;
++    }
++
++    /**
++     * Gets the status change of the player profile
++     *
++     * @return the whitelist status
++     */
++    @NotNull
++    public WhitelistStatus getStatus() {
++        return this.status;
++    }
++
++    @Override
++    public boolean isCancelled() {
++        return this.cancelled;
++    }
++
++    @Override
++    public void setCancelled(boolean cancel) {
++        this.cancelled = cancel;
++    }
++
++    @NotNull
++    @Override
++    public HandlerList getHandlers() {
++        return HANDLER_LIST;
++    }
++
++    @NotNull
++    public static HandlerList getHandlerList() {
++        return HANDLER_LIST;
++    }
++
++    /**
++     * Enum for the whitelist status changes
++     */
++    public enum WhitelistStatus {
++        ADDED, REMOVED
++    }
++}
+diff --git a/src/main/java/org/bukkit/OfflinePlayer.java b/src/main/java/org/bukkit/OfflinePlayer.java
+index 7838731e0e16bdccfb79e74ceb64148f7c52db79..59746d3431b7438399caf9b4d743b89f434aa671 100644
+--- a/src/main/java/org/bukkit/OfflinePlayer.java
++++ b/src/main/java/org/bukkit/OfflinePlayer.java
+@@ -21,6 +21,18 @@ public interface OfflinePlayer extends ServerOperator, AnimalTamer, Configuratio
+      */
+     public boolean isOnline();
+ 
++    // Paper start
++    /**
++     * Checks whether the connection to this player is still valid. This will return
++     * true as long as this specific instance of the player is still connected. This
++     * will return false after this instance has disconnected, even if the same player
++     * has reconnected since.
++     *
++     * @return true if this player instance is connected
++     */
++    public boolean isConnected();
++    // Paper end
++
+     /**
+      * Returns the name of this player
+      * <p>
+diff --git a/src/main/java/org/bukkit/entity/Entity.java b/src/main/java/org/bukkit/entity/Entity.java
+index 62d8d7dbd4d602ca8cb00ff0cf1331583b398323..c9a3c44056ac55900d0fc828c31c108f110a1906 100644
+--- a/src/main/java/org/bukkit/entity/Entity.java
++++ b/src/main/java/org/bukkit/entity/Entity.java
+@@ -36,6 +36,19 @@ public interface Entity extends Metadatable, CommandSender, Nameable, Persistent
+     @NotNull
+     public Location getLocation();
+ 
++    /**
++     * Get all players that are currently tracking this entity.
++     * <p>
++     * 'Tracking' means that this entity has been sent to the player and that
++     * they are receiving updates on its state. Note that the client's {@code
++     * 'Entity Distance'} setting does not affect the range at which entities
++     * are tracked.
++     *
++     * @return the players tracking this entity, or an empty set if none
++     */
++    @NotNull
++    Set<Player> getTrackedBy();
++
+     /**
+      * Stores the entity's current position in the provided Location object.
+      * <p>
+diff --git a/src/main/java/org/bukkit/event/block/Action.java b/src/main/java/org/bukkit/event/block/Action.java
+index 2825263c102d3f9ed37f6884e09ec5efb8105fb9..d144416bf60b86307a935f6288f812eae3466ee4 100644
+--- a/src/main/java/org/bukkit/event/block/Action.java
++++ b/src/main/java/org/bukkit/event/block/Action.java
+@@ -32,5 +32,24 @@ public enum Action {
+      * <li>Triggering tripwire
+      * </ul>
+      */
+-    PHYSICAL,
++    PHYSICAL;
++
++    /**
++     * Gets whether this action is a result of a left click.
++     *
++     * @return Whether it's a left click
++     */
++    public boolean isLeftClick() {
++        return this == LEFT_CLICK_AIR || this == LEFT_CLICK_BLOCK;
++    }
++
++    /**
++     * Gets whether this action is a result of a right click.
++     *
++     * @return Whether it's a right click
++     */
++    public boolean isRightClick() {
++        return this == RIGHT_CLICK_AIR || this == RIGHT_CLICK_BLOCK;
++    }
++    // Paper end
+ }
+diff --git a/src/main/java/org/bukkit/event/entity/PlayerDeathEvent.java b/src/main/java/org/bukkit/event/entity/PlayerDeathEvent.java
+index 3cecfe9f7c253ab474829c612cca2dc05fd5d111..1942200fffa88f30586c96de75a7b8e68e3561fc 100644
+--- a/src/main/java/org/bukkit/event/entity/PlayerDeathEvent.java
++++ b/src/main/java/org/bukkit/event/entity/PlayerDeathEvent.java
+@@ -124,6 +124,11 @@ public class PlayerDeathEvent extends EntityDeathEvent {
+         return (Player) entity;
+     }
+ 
++    @NotNull
++    public Player getPlayer() {
++        return (Player) entity;
++    }
++
+     // Paper start
+     /**
+      * Set the death message that will appear to everyone on the server.
+diff --git a/src/main/java/org/bukkit/map/MapRenderer.java b/src/main/java/org/bukkit/map/MapRenderer.java
+index cb7040876a99a5a7e49b81684ef0f3b79584c376..22d8f31b1b8a5dbb5ab3275068642937c097abfe 100644
+--- a/src/main/java/org/bukkit/map/MapRenderer.java
++++ b/src/main/java/org/bukkit/map/MapRenderer.java
+@@ -54,4 +54,12 @@ public abstract class MapRenderer {
+      */
+     public abstract void render(@NotNull MapView map, @NotNull MapCanvas canvas, @NotNull Player player);
+ 
++    // Purpur - start
++    /**
++     * Check if this is an explorer (aka treasure) map.
++     *
++     * @return True if explorer map
++     */
++    public abstract boolean isExplorerMap();
++    // Purpur - end
+ }
