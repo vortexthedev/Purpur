@@ -1,0 +1,60 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Thu, 26 Sep 2024 00:20:37 +0300
+Subject: [PATCH] Remove eclipse compiler
+
+
+diff --git a/pom.xml b/pom.xml
+index 67dda875e4e03eea698ba569f1aa95cec5dff570..9e1f7dc24f07c208a9292b4efdfb75fb85e2e17b 100644
+--- a/pom.xml
++++ b/pom.xml
+@@ -211,7 +211,7 @@
+         <!-- Purpur - Snapshots -->
+         <repository>
+             <id>purpur-snapshots</id>
+-            <url>https://repo.pl3x.net/</url>
++            <url>https://repo.purpurmc.org/snapshots</url>
+         </repository>
+     </repositories>
+ 
+@@ -312,12 +312,6 @@
+                                         <exclude>META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat</exclude>
+                                     </excludes>
+                                 </filter>
+-                                <filter>
+-                                    <artifact>org.eclipse.sisu:org.eclipse.sisu.inject</artifact>
+-                                    <excludes>
+-                                        <exclude>META-INF/services/javax.annotation.processing.Processor</exclude>
+-                                    </excludes>
+-                                </filter>
+                             </filters>
+                             <relocations>
+                                 <!-- Cannot be relocated as it breaks translation property keys -->
+@@ -360,14 +354,6 @@
+                                     <pattern>org.codehaus.plexus</pattern>
+                                     <shadedPattern>org.bukkit.craftbukkit.libs.org.codehaus.plexus</shadedPattern>
+                                 </relocation>
+-                                <relocation>
+-                                    <pattern>org.eclipse.aether</pattern>
+-                                    <shadedPattern>org.bukkit.craftbukkit.libs.org.eclipse.aether</shadedPattern>
+-                                </relocation>
+-                                <relocation>
+-                                    <pattern>org.eclipse.sisu</pattern>
+-                                    <shadedPattern>org.bukkit.craftbukkit.libs.org.eclipse.sisu</shadedPattern>
+-                                </relocation>
+                                 <relocation>
+                                     <pattern>org.objectweb.asm</pattern>
+                                     <shadedPattern>org.bukkit.craftbukkit.libs.org.objectweb.asm</shadedPattern>
+@@ -417,12 +403,6 @@
+                         <artifactId>plexus-compiler-eclipse</artifactId>
+                         <version>2.15.0</version>
+                     </dependency>
+-                    <dependency>
+-                        <groupId>org.eclipse.jdt</groupId>
+-                        <artifactId>ecj</artifactId>
+-                        <!-- Purpur start -->
+-                        <version>3.39.0</version>
+-                    </dependency>
+                     <dependency>
+                         <groupId>org.jetbrains.kotlin</groupId>
+                         <artifactId>kotlin-stdlib</artifactId>
