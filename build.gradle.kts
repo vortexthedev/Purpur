@@ -4,6 +4,11 @@ plugins {
     id("xyz.jpenilla.toothpick")
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
 toothpick {
     forkName = "Purpur"
     groupId = "org.purpurmc.purpur"
@@ -35,17 +40,17 @@ subprojects {
         implementation("org.checkerframework:checker:3.47.0")
     }
 
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
     repositories {
         maven("https://nexus.velocitypowered.com/repository/velocity-artifacts-snapshots/")
         maven("https://oss.sonatype.org/content/repositories/snapshots/") {
             name = "sonatype-oss-snapshots"
         }
         mavenLocal()
-    }
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 
     publishing.repositories.maven("https://repo.purpurmc.org/snapshots") {
