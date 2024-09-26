@@ -1,0 +1,50 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Thu, 26 Sep 2024 02:45:16 +0300
+Subject: [PATCH] Send messages
+
+
+diff --git a/src/main/java/org/bukkit/command/CommandSender.java b/src/main/java/org/bukkit/command/CommandSender.java
+index ca6d3afd6fa51c0822e289356025b51bc50f55a7..63fbe3197918aaeab49d0397d2873dc91e3204e7 100644
+--- a/src/main/java/org/bukkit/command/CommandSender.java
++++ b/src/main/java/org/bukkit/command/CommandSender.java
+@@ -25,7 +25,7 @@ public interface CommandSender extends net.kyori.adventure.audience.Audience, Pe
+      * @param messages An array of messages to be displayed
+      * @see #sendMessage(net.kyori.adventure.text.Component)
+      */
+-    public void sendMessage(@NotNull String[] messages);
++    public void sendMessage(@NotNull String... messages);
+ 
+     /**
+      * Sends this sender a message
+@@ -43,7 +43,7 @@ public interface CommandSender extends net.kyori.adventure.audience.Audience, Pe
+      * @param sender The sender of this message
+      * @see #sendMessage(net.kyori.adventure.identity.Identified, net.kyori.adventure.text.Component)
+      */
+-    public void sendMessage(@Nullable UUID sender, @NotNull String[] messages);
++    public void sendMessage(@Nullable UUID sender, @NotNull String... messages);
+ 
+     /**
+      * Returns the server instance that this command is running on
+diff --git a/src/main/java/org/bukkit/command/MessageCommandSender.java b/src/main/java/org/bukkit/command/MessageCommandSender.java
+index a7ef1f51c2b96617a32e6e7b1723e8770ba8a6a8..43d5495f3440bf13c0c1f85224aba0fc7600e2df 100644
+--- a/src/main/java/org/bukkit/command/MessageCommandSender.java
++++ b/src/main/java/org/bukkit/command/MessageCommandSender.java
+@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
+ public interface MessageCommandSender extends CommandSender {
+ 
+     @Override
+-    default void sendMessage(@NotNull String[] messages) {
++    default void sendMessage(@NotNull String... messages) {
+         for (String message : messages) {
+             sendMessage(message);
+         }
+@@ -32,7 +32,7 @@ public interface MessageCommandSender extends CommandSender {
+     }
+ 
+     @Override
+-    default void sendMessage(@Nullable UUID sender, @NotNull String[] messages) {
++    default void sendMessage(@Nullable UUID sender, @NotNull String... messages) {
+         for (String message : messages) {
+             sendMessage(message);
+         }
