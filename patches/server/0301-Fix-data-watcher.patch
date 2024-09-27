@@ -1,0 +1,47 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Fri, 27 Sep 2024 02:22:16 +0300
+Subject: [PATCH] Fix data watcher
+
+
+diff --git a/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java b/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
+index 81facffcbcff039543128d9f56d8d4eb06244f4a..4e391f098364284eb4ca0ab862d88a8c7cba5d06 100644
+--- a/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
++++ b/src/main/java/net/minecraft/network/syncher/SynchedEntityData.java
+@@ -21,7 +21,7 @@ public class SynchedEntityData {
+     static final ClassTreeIdRegistry ID_REGISTRY = new ClassTreeIdRegistry();
+     private final SyncedDataHolder entity;
+     private final SynchedEntityData.DataItem<?>[] itemsById;
+-    private boolean isDirty;
++    public boolean isDirty;
+ 
+     public SynchedEntityData(Class<?> clazz) {
+         this.entity = null;
+@@ -103,7 +103,7 @@ public class SynchedEntityData {
+             for (int j = 0; j < i; ++j) {
+                 SynchedEntityData.DataItem<?> datawatcher_item = adatawatcher_item[j];
+ 
+-                if (datawatcher_item.isDirty()) {
++                if (datawatcher_item != null && datawatcher_item.isDirty()) {
+                     datawatcher_item.setDirty(false);
+                     list.add(datawatcher_item.value());
+                 }
+@@ -122,7 +122,7 @@ public class SynchedEntityData {
+         for (int j = 0; j < i; ++j) {
+             SynchedEntityData.DataItem<?> datawatcher_item = adatawatcher_item[j];
+ 
+-            if (!datawatcher_item.isSetToDefault()) {
++            if (datawatcher_item != null && !datawatcher_item.isSetToDefault()) {
+                 if (list == null) {
+                     list = new ArrayList();
+                 }
+@@ -163,7 +163,8 @@ public class SynchedEntityData {
+     public List<SynchedEntityData.DataValue<?>> packAll() {
+         final List<SynchedEntityData.DataValue<?>> list = new ArrayList<>();
+         for (final DataItem<?> dataItem : this.itemsById) {
+-            list.add(dataItem.value());
++            if (dataItem != null)
++                list.add(dataItem.value());
+         }
+ 
+         return list;
