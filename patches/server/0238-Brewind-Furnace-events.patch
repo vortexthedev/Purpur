@@ -1,0 +1,103 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Fri, 27 Sep 2024 02:19:51 +0300
+Subject: [PATCH] Brewind & Furnace events
+
+
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/TileEntityBrewingStand.java b/src/main/java/net/minecraft/world/level/block/entity/TileEntityBrewingStand.java
+index 95ca7d9e1eadbe5cc5674ed7352c1ed4d707363d..b348c224347b2c49febe9203189f77ca10d7de55 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/TileEntityBrewingStand.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/TileEntityBrewingStand.java
+@@ -27,9 +27,11 @@ import net.minecraft.world.level.block.state.IBlockData;
+ // CraftBukkit start
+ import java.util.List;
+ import net.minecraft.server.MinecraftServer;
++import org.bukkit.craftbukkit.block.CraftBlock;
+ import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+ import org.bukkit.craftbukkit.inventory.CraftItemStack;
+ import org.bukkit.entity.HumanEntity;
++import org.bukkit.event.block.BrewingStartEvent;
+ import org.bukkit.event.inventory.BrewEvent;
+ import org.bukkit.event.inventory.BrewingStandFuelEvent;
+ import org.bukkit.inventory.InventoryHolder;
+@@ -185,7 +187,11 @@ public class TileEntityBrewingStand extends TileEntityContainer implements IWorl
+             }
+         } else if (flag && this.fuelLevel > 0) {
+             --this.fuelLevel;
+-            this.brewTime = 400;
++            // CraftBukkit start
++            BrewingStartEvent event = new BrewingStartEvent(CraftBlock.at(world, position), CraftItemStack.asCraftMirror(itemstack1), 400);
++            world.getServer().getPluginManager().callEvent(event);
++            brewTime = event.getTotalBrewTime(); // 400 -> event.getTotalBrewTime()
++            // CraftBukkit end
+             this.k = itemstack1.getItem();
+             this.update();
+         }
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/TileEntityFurnace.java b/src/main/java/net/minecraft/world/level/block/entity/TileEntityFurnace.java
+index ac42fd627009a87709448354f232d8b5ed7fa6b9..4e5d5fafd2c068f97c95a5fdfdf00a1252bf747b 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/TileEntityFurnace.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/TileEntityFurnace.java
+@@ -6,10 +6,6 @@ import com.google.common.collect.Maps;
+ import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
+ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+ import it.unimi.dsi.fastutil.objects.ObjectIterator;
+-import java.util.Iterator;
+-import java.util.List;
+-import java.util.Map;
+-import javax.annotation.Nullable;
+ import net.minecraft.SharedConstants;
+ import net.minecraft.SystemUtils;
+ import net.minecraft.core.BlockPosition;
+@@ -41,9 +37,6 @@ import net.minecraft.world.level.block.Blocks;
+ import net.minecraft.world.level.block.state.IBlockData;
+ import net.minecraft.world.level.material.Fluid;
+ import net.minecraft.world.phys.Vec3D;
+-
+-// CraftBukkit start
+-import java.util.List;
+ import org.bukkit.craftbukkit.block.CraftBlock;
+ import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+ import org.bukkit.craftbukkit.inventory.CraftItemStack;
+@@ -52,6 +45,13 @@ import org.bukkit.entity.Player;
+ import org.bukkit.event.inventory.FurnaceBurnEvent;
+ import org.bukkit.event.inventory.FurnaceExtractEvent;
+ import org.bukkit.event.inventory.FurnaceSmeltEvent;
++import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
++import org.bukkit.inventory.CookingRecipe;
++
++import javax.annotation.Nullable;
++import java.util.Iterator;
++import java.util.List;
++import java.util.Map;
+ // CraftBukkit end
+ 
+ public abstract class TileEntityFurnace extends TileEntityContainer implements IWorldInventory, RecipeHolder, AutoRecipeOutput, ITickable {
+@@ -366,7 +366,13 @@ public abstract class TileEntityFurnace extends TileEntityContainer implements I
+                     ++this.cookTime;
+                     if (this.cookTime >= this.cookTimeTotal) { // Paper - cook speed multiplier API
+                         this.cookTime = 0;
+-                        this.cookTimeTotal = this.getRecipeCookingTime();
++
++                        org.bukkit.inventory.ItemStack source = CraftItemStack.asCraftMirror(items.get(0));
++                        FurnaceStartSmeltEvent event = new FurnaceStartSmeltEvent(CraftBlock.at(world, position),
++                                source, (CookingRecipe<?>) irecipe.toBukkitRecipe(), getRecipeCookingTime()); // Paper - cook speed multiplier API
++                        world.getServer().getPluginManager().callEvent(event);
++                        cookTimeTotal = event.getTotalCookTime();
++
+                         this.burn(irecipe);
+                         flag1 = true;
+                     }
+@@ -549,7 +555,12 @@ public abstract class TileEntityFurnace extends TileEntityContainer implements I
+         }
+ 
+         if (i == 0 && !flag) {
+-            this.cookTimeTotal = this.getRecipeCookingTime();
++            IRecipe irecipe = this.world.getCraftingManager().craft((Recipes<RecipeCooking>) this.c, this, this.world).orElse(null); // Eclipse fail
++            org.bukkit.inventory.ItemStack source = CraftItemStack.asCraftMirror(items.get(0));
++            FurnaceStartSmeltEvent event = new FurnaceStartSmeltEvent(CraftBlock.at(world, position),
++                    source, (CookingRecipe<?>) irecipe.toBukkitRecipe(), getRecipeCookingTime()); // Paper - cook speed multiplier API
++            world.getServer().getPluginManager().callEvent(event);
++            this.cookTimeTotal = event.getTotalCookTime();
+             this.cookTime = 0;
+             this.update();
+         }
