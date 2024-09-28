@@ -1,0 +1,72 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Sat, 28 Sep 2024 20:43:40 +0300
+Subject: [PATCH] Armor stand helper
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 0f69e239a7c5e9e2f3ed5c8d9325f5eefc67c544..569c4646645694ca1a2b8390cd5b2e635cce978c 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -359,8 +359,8 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     public static final int FLAG_INVISIBLE = 5;
+     protected static final int FLAG_GLOWING = 6;
+     protected static final int FLAG_FALL_FLYING = 7;
+-    protected static final EntityDataAccessor<Optional<Component>> DATA_CUSTOM_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
+     protected static final EntityDataAccessor<Integer> DATA_AIR_SUPPLY_ID = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.INT);
++    protected static final EntityDataAccessor<Optional<Component>> DATA_CUSTOM_NAME = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.OPTIONAL_COMPONENT);
+     protected static final EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
+     protected static final EntityDataAccessor<Boolean> DATA_SILENT = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
+     protected static final EntityDataAccessor<Boolean> DATA_NO_GRAVITY = SynchedEntityData.defineId(Entity.class, EntityDataSerializers.BOOLEAN);
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index 667938f7a1fdfe29d59cc578379911c5aa703b82..24f6791c35e488041521ccb52089c7e04502c713 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -180,11 +180,11 @@ public abstract class LivingEntity extends Entity implements Attackable {
+     protected static final int LIVING_ENTITY_FLAG_SPIN_ATTACK = 4;
+     protected static final EntityDataAccessor<Byte> DATA_LIVING_ENTITY_FLAGS = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.BYTE);
+     public static final EntityDataAccessor<Float> DATA_HEALTH_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.FLOAT);
+-    private static final EntityDataAccessor<List<ParticleOptions>> DATA_EFFECT_PARTICLES = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.PARTICLES);
+-    private static final EntityDataAccessor<Boolean> DATA_EFFECT_AMBIENCE_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.BOOLEAN);
++    protected static final EntityDataAccessor<List<ParticleOptions>> DATA_EFFECT_PARTICLES = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.PARTICLES);
++    protected static final EntityDataAccessor<Boolean> DATA_EFFECT_AMBIENCE_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.BOOLEAN);
+     public static final EntityDataAccessor<Integer> DATA_ARROW_COUNT_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.INT);
+-    private static final EntityDataAccessor<Integer> DATA_STINGER_COUNT_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.INT);
+-    private static final EntityDataAccessor<Optional<BlockPos>> SLEEPING_POS_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
++    protected static final EntityDataAccessor<Integer> DATA_STINGER_COUNT_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.INT);
++    protected static final EntityDataAccessor<Optional<BlockPos>> SLEEPING_POS_ID = SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.OPTIONAL_BLOCK_POS);
+     private static final int PARTICLE_FREQUENCY_WHEN_INVISIBLE = 15;
+     protected static final EntityDimensions SLEEPING_DIMENSIONS = EntityDimensions.fixed(0.2F, 0.2F).withEyeHeight(0.2F);
+     public static final float EXTRA_RENDER_CULLING_SIZE_WITH_BIG_HAT = 0.5F;
+diff --git a/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java b/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
+index 0f3e035ac950152dc7618f913994ef93ba71c765..62539a0c584c09e2ffafb9fa3a10542daf7178b8 100644
+--- a/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
++++ b/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
+@@ -86,14 +86,23 @@ public class ArmorStand extends LivingEntity {
+     public static final EntityDataAccessor<Rotations> DATA_RIGHT_LEG_POSE = SynchedEntityData.defineId(ArmorStand.class, EntityDataSerializers.ROTATIONS);
+ 
+     public static void applyWatcher(List<SynchedEntityData.DataValue<?>> items, Component text, boolean visibility, boolean sneaking) {
+-        items.add(SynchedEntityData.DataValue.create(DATA_SHARED_FLAGS_ID, (byte) 0));
+-        items.add(SynchedEntityData.DataValue.create(DATA_AIR_SUPPLY_ID, (sneaking ? 34 : 32)));
+-        items.add(SynchedEntityData.DataValue.create(DATA_CUSTOM_NAME_VISIBLE, visibility));
++        items.add(SynchedEntityData.DataValue.create(DATA_SHARED_FLAGS_ID, (byte) (sneaking ? 34 : 32)));
++        items.add(SynchedEntityData.DataValue.create(DATA_AIR_SUPPLY_ID, 300));
+         items.add(SynchedEntityData.DataValue.create(DATA_CUSTOM_NAME, Optional.ofNullable(text)));
++        items.add(SynchedEntityData.DataValue.create(DATA_CUSTOM_NAME_VISIBLE, visibility));
+         items.add(SynchedEntityData.DataValue.create(DATA_SILENT, false));
+         items.add(SynchedEntityData.DataValue.create(DATA_NO_GRAVITY, false));
+-        items.add(SynchedEntityData.DataValue.create(DATA_POSE, net.minecraft.world.entity.Pose.STANDING));
++        items.add(SynchedEntityData.DataValue.create(DATA_POSE, Pose.STANDING));
+         items.add(SynchedEntityData.DataValue.create(DATA_TICKS_FROZEN, 0));
++
++        items.add(SynchedEntityData.DataValue.create(DATA_LIVING_ENTITY_FLAGS, (byte) 0));
++        items.add(SynchedEntityData.DataValue.create(DATA_EFFECT_PARTICLES, List.of()));
++        items.add(SynchedEntityData.DataValue.create(DATA_EFFECT_AMBIENCE_ID, false));
++        items.add(SynchedEntityData.DataValue.create(DATA_ARROW_COUNT_ID, 0));
++        items.add(SynchedEntityData.DataValue.create(DATA_STINGER_COUNT_ID, 0));
++        items.add(SynchedEntityData.DataValue.create(DATA_HEALTH_ID, 1.0F));
++        items.add(SynchedEntityData.DataValue.create(SLEEPING_POS_ID, Optional.empty()));
++
+         items.add(SynchedEntityData.DataValue.create(DATA_CLIENT_FLAGS, (byte) 16));
+         items.add(SynchedEntityData.DataValue.create(DATA_HEAD_POSE, DEFAULT_HEAD_POSE));
+         items.add(SynchedEntityData.DataValue.create(DATA_BODY_POSE, DEFAULT_BODY_POSE));
