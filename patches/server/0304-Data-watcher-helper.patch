@@ -1,0 +1,195 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Sun, 29 Sep 2024 00:57:22 +0300
+Subject: [PATCH] Data watcher helper
+
+
+diff --git a/src/main/java/net/minecraft/world/entity/AgeableMob.java b/src/main/java/net/minecraft/world/entity/AgeableMob.java
+index 3dc3609d13a7b823d15384d1c385b68eeb933d26..f7e567d9978e99135dac0584cfbf48933ef26451 100644
+--- a/src/main/java/net/minecraft/world/entity/AgeableMob.java
++++ b/src/main/java/net/minecraft/world/entity/AgeableMob.java
+@@ -3,6 +3,7 @@ package net.minecraft.world.entity;
+ import javax.annotation.Nullable;
+ import net.minecraft.core.particles.ParticleTypes;
+ import net.minecraft.nbt.CompoundTag;
++import net.minecraft.network.chat.Component;
+ import net.minecraft.network.syncher.EntityDataAccessor;
+ import net.minecraft.network.syncher.EntityDataSerializers;
+ import net.minecraft.network.syncher.SynchedEntityData;
+@@ -11,10 +12,15 @@ import net.minecraft.world.DifficultyInstance;
+ import net.minecraft.world.entity.vehicle.Boat;
+ import net.minecraft.world.level.Level;
+ import net.minecraft.world.level.ServerLevelAccessor;
++import java.util.List;
+ 
+ public abstract class AgeableMob extends PathfinderMob {
+ 
+     private static final EntityDataAccessor<Boolean> DATA_BABY_ID = SynchedEntityData.defineId(AgeableMob.class, EntityDataSerializers.BOOLEAN);
++    public static void applyAgeableWatcher(List<SynchedEntityData.DataValue<?>> items, byte flag, Component name, boolean visibility) {
++        applyLivingEntityWatcher(items, flag, name, visibility);
++        items.add(SynchedEntityData.DataValue.create(DATA_BABY_ID, true));
++    }
+     public static final int BABY_START_AGE = -24000;
+     private static final int FORCED_AGE_PARTICLE_TICKS = 40;
+     protected int age;
+diff --git a/src/main/java/net/minecraft/world/entity/Entity.java b/src/main/java/net/minecraft/world/entity/Entity.java
+index 569c4646645694ca1a2b8390cd5b2e635cce978c..645ef618a5e8791d9e0d31cd2fae605ed291764f 100644
+--- a/src/main/java/net/minecraft/world/entity/Entity.java
++++ b/src/main/java/net/minecraft/world/entity/Entity.java
+@@ -279,6 +279,17 @@ public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess
+     }
+     // CraftBukkit end
+ 
++    public static void applyEntityWatcher(List<SynchedEntityData.DataValue<?>> items, byte flag, Component name, boolean visibility) {
++        items.add(SynchedEntityData.DataValue.create(DATA_SHARED_FLAGS_ID, flag));
++        items.add(SynchedEntityData.DataValue.create(DATA_AIR_SUPPLY_ID, 300));
++        items.add(SynchedEntityData.DataValue.create(DATA_CUSTOM_NAME, Optional.ofNullable(name)));
++        items.add(SynchedEntityData.DataValue.create(DATA_CUSTOM_NAME_VISIBLE, visibility));
++        items.add(SynchedEntityData.DataValue.create(DATA_SILENT, false));
++        items.add(SynchedEntityData.DataValue.create(DATA_NO_GRAVITY, false));
++        items.add(SynchedEntityData.DataValue.create(DATA_POSE, net.minecraft.world.entity.Pose.STANDING));
++        items.add(SynchedEntityData.DataValue.create(DATA_TICKS_FROZEN, 0));
++    }
++
+     private static final Logger LOGGER = LogUtils.getLogger();
+     public static final String ID_TAG = "id";
+     public static final String PASSENGERS_TAG = "Passengers";
+diff --git a/src/main/java/net/minecraft/world/entity/LivingEntity.java b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+index 24f6791c35e488041521ccb52089c7e04502c713..acaa4f34011478a5241800c954f136af125daa5e 100644
+--- a/src/main/java/net/minecraft/world/entity/LivingEntity.java
++++ b/src/main/java/net/minecraft/world/entity/LivingEntity.java
+@@ -38,6 +38,7 @@ import net.minecraft.nbt.IntTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.NbtOps;
+ import net.minecraft.nbt.Tag;
++import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+ import net.minecraft.network.protocol.game.ClientboundAnimatePacket;
+ import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
+@@ -275,7 +276,18 @@ public abstract class LivingEntity extends Entity implements Attackable {
+     public boolean silentDeath = false; // Paper - mark entity as dying silently for cancellable death event
+     public net.kyori.adventure.util.TriState frictionState = net.kyori.adventure.util.TriState.NOT_SET; // Paper - Friction API
+     protected boolean shouldBurnInDay = false;  public boolean shouldBurnInDay() { return this.shouldBurnInDay; } public void setShouldBurnInDay(boolean shouldBurnInDay) { this.shouldBurnInDay = shouldBurnInDay; } // Purpur
+-
++    
++    public static void applyLivingEntityWatcher(List<SynchedEntityData.DataValue<?>> items, byte flag, Component name, boolean visibility) {
++        applyEntityWatcher(items, flag, name, visibility);
++        items.add(SynchedEntityData.DataValue.create(DATA_LIVING_ENTITY_FLAGS, (byte) 0));
++        items.add(SynchedEntityData.DataValue.create(DATA_EFFECT_PARTICLES, List.of()));
++        items.add(SynchedEntityData.DataValue.create(DATA_EFFECT_AMBIENCE_ID, false));
++        items.add(SynchedEntityData.DataValue.create(DATA_ARROW_COUNT_ID, 0));
++        items.add(SynchedEntityData.DataValue.create(DATA_STINGER_COUNT_ID, 0));
++        items.add(SynchedEntityData.DataValue.create(DATA_HEALTH_ID, 1.0F));
++        items.add(SynchedEntityData.DataValue.create(SLEEPING_POS_ID, Optional.empty()));
++    }
++    
+     @Override
+     public float getBukkitYaw() {
+         return this.getYHeadRot();
+diff --git a/src/main/java/net/minecraft/world/entity/Mob.java b/src/main/java/net/minecraft/world/entity/Mob.java
+index 174117898f349f83810d45152ca96ececa2a5be5..befa381aaa0c20ece3c536c62402572d2e1c711b 100644
+--- a/src/main/java/net/minecraft/world/entity/Mob.java
++++ b/src/main/java/net/minecraft/world/entity/Mob.java
+@@ -24,6 +24,7 @@ import net.minecraft.nbt.FloatTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.NbtUtils;
+ import net.minecraft.nbt.Tag;
++import net.minecraft.network.chat.Component;
+ import net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket;
+ import net.minecraft.network.protocol.game.DebugPackets;
+ import net.minecraft.network.syncher.EntityDataAccessor;
+@@ -154,6 +155,11 @@ public abstract class Mob extends LivingEntity implements EquipmentUser, Targeti
+     public int ticksSinceLastInteraction; // Purpur
+     public boolean aware = true; // CraftBukkit
+ 
++    public static void applyMobWatcher(List<SynchedEntityData.DataValue<?>> items, byte flag, Component name, boolean visibility) {
++        applyLivingEntityWatcher(items, flag, name, visibility);
++        items.add(SynchedEntityData.DataValue.create(DATA_MOB_FLAGS_ID, (byte) 0));
++    }
++
+     protected Mob(EntityType<? extends Mob> type, Level world) {
+         super(type, world);
+         this.handItems = NonNullList.withSize(2, ItemStack.EMPTY);
+diff --git a/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java b/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
+index 62539a0c584c09e2ffafb9fa3a10542daf7178b8..31f07fffc141c62150fc5235703258e0ce894eac 100644
+--- a/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
++++ b/src/main/java/net/minecraft/world/entity/decoration/ArmorStand.java
+@@ -85,24 +85,8 @@ public class ArmorStand extends LivingEntity {
+     public static final EntityDataAccessor<Rotations> DATA_LEFT_LEG_POSE = SynchedEntityData.defineId(ArmorStand.class, EntityDataSerializers.ROTATIONS);
+     public static final EntityDataAccessor<Rotations> DATA_RIGHT_LEG_POSE = SynchedEntityData.defineId(ArmorStand.class, EntityDataSerializers.ROTATIONS);
+ 
+-    public static void applyWatcher(List<SynchedEntityData.DataValue<?>> items, Component text, boolean visibility, boolean sneaking) {
+-        items.add(SynchedEntityData.DataValue.create(DATA_SHARED_FLAGS_ID, (byte) (sneaking ? 34 : 32)));
+-        items.add(SynchedEntityData.DataValue.create(DATA_AIR_SUPPLY_ID, 300));
+-        items.add(SynchedEntityData.DataValue.create(DATA_CUSTOM_NAME, Optional.ofNullable(text)));
+-        items.add(SynchedEntityData.DataValue.create(DATA_CUSTOM_NAME_VISIBLE, visibility));
+-        items.add(SynchedEntityData.DataValue.create(DATA_SILENT, false));
+-        items.add(SynchedEntityData.DataValue.create(DATA_NO_GRAVITY, false));
+-        items.add(SynchedEntityData.DataValue.create(DATA_POSE, Pose.STANDING));
+-        items.add(SynchedEntityData.DataValue.create(DATA_TICKS_FROZEN, 0));
+-
+-        items.add(SynchedEntityData.DataValue.create(DATA_LIVING_ENTITY_FLAGS, (byte) 0));
+-        items.add(SynchedEntityData.DataValue.create(DATA_EFFECT_PARTICLES, List.of()));
+-        items.add(SynchedEntityData.DataValue.create(DATA_EFFECT_AMBIENCE_ID, false));
+-        items.add(SynchedEntityData.DataValue.create(DATA_ARROW_COUNT_ID, 0));
+-        items.add(SynchedEntityData.DataValue.create(DATA_STINGER_COUNT_ID, 0));
+-        items.add(SynchedEntityData.DataValue.create(DATA_HEALTH_ID, 1.0F));
+-        items.add(SynchedEntityData.DataValue.create(SLEEPING_POS_ID, Optional.empty()));
+-
++    public static void applyWatcher(List<SynchedEntityData.DataValue<?>> items, Component name, boolean visibility, boolean sneaking) {
++        applyLivingEntityWatcher(items, (byte) (sneaking ? 34 : 32), name, visibility);
+         items.add(SynchedEntityData.DataValue.create(DATA_CLIENT_FLAGS, (byte) 16));
+         items.add(SynchedEntityData.DataValue.create(DATA_HEAD_POSE, DEFAULT_HEAD_POSE));
+         items.add(SynchedEntityData.DataValue.create(DATA_BODY_POSE, DEFAULT_BODY_POSE));
+diff --git a/src/main/java/net/minecraft/world/entity/monster/Zombie.java b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
+index d48d22157a89f98c1bbabc70b0bb31187038176d..1738861f474d2d719fa5f662d9407cd64cf3c922 100644
+--- a/src/main/java/net/minecraft/world/entity/monster/Zombie.java
++++ b/src/main/java/net/minecraft/world/entity/monster/Zombie.java
+@@ -6,6 +6,7 @@ import java.util.List;
+ import java.util.UUID;
+ import java.util.function.Predicate;
+ import javax.annotation.Nullable;
++import net.minecraft.network.chat.Component;
+ import net.minecraft.util.Mth;
+ import net.minecraft.util.RandomSource;
+ import net.minecraft.world.Difficulty;
+@@ -79,6 +80,14 @@ public class Zombie extends Monster {
+     private static final EntityDataAccessor<Boolean> DATA_BABY_ID = SynchedEntityData.defineId(Zombie.class, EntityDataSerializers.BOOLEAN);
+     private static final EntityDataAccessor<Integer> DATA_SPECIAL_TYPE_ID = SynchedEntityData.defineId(Zombie.class, EntityDataSerializers.INT);
+     public static final EntityDataAccessor<Boolean> DATA_DROWNED_CONVERSION_ID = SynchedEntityData.defineId(Zombie.class, EntityDataSerializers.BOOLEAN);
++
++    public static void applyZombieWatcher(List<SynchedEntityData.DataValue<?>> items, byte flag, Component name, boolean visibility) {
++        applyLivingEntityWatcher(items, flag, name, visibility);
++        items.add(SynchedEntityData.DataValue.create(DATA_BABY_ID, true));
++        items.add(SynchedEntityData.DataValue.create(DATA_SPECIAL_TYPE_ID, 0));
++        items.add(SynchedEntityData.DataValue.create(DATA_DROWNED_CONVERSION_ID, false));
++    }
++
+     public static final float ZOMBIE_LEADER_CHANCE = 0.05F;
+     public static final int REINFORCEMENT_ATTEMPTS = 50;
+     public static final int REINFORCEMENT_RANGE_MAX = 40;
+diff --git a/src/main/java/net/minecraft/world/entity/monster/piglin/Piglin.java b/src/main/java/net/minecraft/world/entity/monster/piglin/Piglin.java
+index 1b5977aa14d9a7254e7692bb152cc2808d52107a..62331d2a2504ca3967bf2f69061bee636101d36e 100644
+--- a/src/main/java/net/minecraft/world/entity/monster/piglin/Piglin.java
++++ b/src/main/java/net/minecraft/world/entity/monster/piglin/Piglin.java
+@@ -5,6 +5,7 @@ import com.mojang.serialization.Dynamic;
+ import java.util.List;
+ import java.util.UUID;
+ import javax.annotation.Nullable;
++import net.minecraft.network.chat.Component;
+ import net.minecraft.util.RandomSource;
+ import net.minecraft.util.VisibleForDebug;
+ import net.minecraft.world.DifficultyInstance;
+@@ -70,6 +71,12 @@ public class Piglin extends AbstractPiglin implements CrossbowAttackMob, Invento
+     private static final EntityDataAccessor<Boolean> DATA_BABY_ID = SynchedEntityData.defineId(Piglin.class, EntityDataSerializers.BOOLEAN);
+     private static final EntityDataAccessor<Boolean> DATA_IS_CHARGING_CROSSBOW = SynchedEntityData.defineId(Piglin.class, EntityDataSerializers.BOOLEAN);
+     private static final EntityDataAccessor<Boolean> DATA_IS_DANCING = SynchedEntityData.defineId(Piglin.class, EntityDataSerializers.BOOLEAN);
++    public static void applyPiglinWatcher(List<SynchedEntityData.DataValue<?>> items, byte flag, Component name, boolean visibility) {
++        applyLivingEntityWatcher(items, flag, name, visibility);
++        items.add(SynchedEntityData.DataValue.create(DATA_BABY_ID, true));
++        items.add(SynchedEntityData.DataValue.create(DATA_IS_CHARGING_CROSSBOW, false));
++        items.add(SynchedEntityData.DataValue.create(DATA_IS_DANCING, false));
++    }
+     private static final UUID SPEED_MODIFIER_BABY_UUID = UUID.fromString("766bfa64-11f3-11ea-8d71-362b9e155667");
+     private static final AttributeModifier SPEED_MODIFIER_BABY = new AttributeModifier(Piglin.SPEED_MODIFIER_BABY_UUID, "Baby speed boost", 0.20000000298023224D, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+     private static final int MAX_HEALTH = 16;
