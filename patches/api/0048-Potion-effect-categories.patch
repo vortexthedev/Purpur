@@ -83,3 +83,91 @@ index 0000000000000000000000000000000000000000..15a55a574ca15d036d5e8c3cea42836c
 +    NEUTRAL;
 +
 +}
+
+diff --git a/src/main/java/org/bukkit/potion/PotionEffect.java b/src/main/java/org/bukkit/potion/PotionEffect.java
+index 913417fcf9bc007c0496e0c22d100f791fcdad4e..8a0ec9c39762d8b2a94c1cb662ae8a65ee41b868 100644
+--- a/src/main/java/org/bukkit/potion/PotionEffect.java
++++ b/src/main/java/org/bukkit/potion/PotionEffect.java
+@@ -284,4 +284,5 @@ public class PotionEffect implements ConfigurationSerializable {
+     public String toString() {
+         return type.getName() + (ambient ? ":(" : ":") + duration + "t-x" + amplifier + (ambient ? ")" : "");
+     }
++
+ }
+diff --git a/src/main/java/org/bukkit/potion/PotionEffectType.java b/src/main/java/org/bukkit/potion/PotionEffectType.java
+index 7e52cb03e0b2327fc1b141e2925c13e209aa4e2b..1595345f9ca59b23c3437bb26832634d3f534441 100644
+--- a/src/main/java/org/bukkit/potion/PotionEffectType.java
++++ b/src/main/java/org/bukkit/potion/PotionEffectType.java
+@@ -338,4 +338,40 @@ public abstract class PotionEffectType {
+     public static PotionEffectType[] values() {
+         return Arrays.copyOfRange(byId, 1, byId.length);
+     }
++
++
++    /**
++     * Gets the category of this effect
++     *
++     * @return the category
++     */
++    public abstract @NotNull PotionEffectType.Category getEffectCategory();
++
++    /**
++     * Category of {@link PotionEffectType}s
++     */
++    public enum Category {
++
++        BENEFICIAL(net.kyori.adventure.text.format.NamedTextColor.BLUE),
++        HARMFUL(net.kyori.adventure.text.format.NamedTextColor.RED),
++        NEUTRAL(net.kyori.adventure.text.format.NamedTextColor.BLUE);
++
++        private final net.kyori.adventure.text.format.TextColor color;
++
++        Category(net.kyori.adventure.text.format.TextColor color) {
++            this.color = color;
++        }
++
++        /**
++         * Gets the text color used when displaying potions
++         * of this category.
++         *
++         * @return the text color
++         */
++        @NotNull
++        public net.kyori.adventure.text.format.TextColor getColor() {
++            return color;
++        }
++    }
++    // Paper end
+ }
+diff --git a/src/main/java/org/bukkit/potion/PotionEffectTypeWrapper.java b/src/main/java/org/bukkit/potion/PotionEffectTypeWrapper.java
+index 47d46edc49c8a35ff9e8b462ea045f192f98d1f4..72d86fdad145859a791185541ac6d0f9a2a19906 100644
+--- a/src/main/java/org/bukkit/potion/PotionEffectTypeWrapper.java
++++ b/src/main/java/org/bukkit/potion/PotionEffectTypeWrapper.java
+@@ -34,6 +34,11 @@ public class PotionEffectTypeWrapper extends PotionEffectType {
+         return getType().isInstant();
+     }
+
++    @Override
++    public @NotNull PotionEffectType.Category getEffectCategory() {
++        return this.getType().getEffectCategory();
++    }
++
+     @NotNull
+     @Override
+     public Color getColor() {
+diff --git a/src/main/java/org/bukkit/potion/PotionEffectTypeWrapper.java b/src/main/java/org/bukkit/potion/PotionEffectTypeWrapper.java
+index 72d86fdad145859a791185541ac6d0f9a2a19906..9e97761d1206b9b08d6174e9b70dab35e47ccdd6 100644
+--- a/src/main/java/org/bukkit/potion/PotionEffectTypeWrapper.java
++++ b/src/main/java/org/bukkit/potion/PotionEffectTypeWrapper.java
+@@ -39,6 +39,11 @@ public class PotionEffectTypeWrapper extends PotionEffectType {
+         return this.getType().getEffectCategory();
+     }
+
++    @Override
++    public @NotNull PotionEffectTypeCategory getCategory() {
++        return this.getType().getCategory();
++    }
++
+     @NotNull
+     @Override
+     public Color getColor() {
