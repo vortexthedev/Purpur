@@ -1,0 +1,22 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Sun, 29 Sep 2024 14:41:41 +0300
+Subject: [PATCH] Fix location saving
+
+
+diff --git a/src/main/java/org/bukkit/Location.java b/src/main/java/org/bukkit/Location.java
+index 92303dd833e05b4595859ed945b83a2f9d5dee89..41175e59de15574a4d9040a5a991ebc7762316a3 100644
+--- a/src/main/java/org/bukkit/Location.java
++++ b/src/main/java/org/bukkit/Location.java
+@@ -65,10 +65,7 @@ public class Location implements Cloneable, ConfigurationSerializable {
+      * @param pitch The absolute rotation on the y-plane, in degrees
+      */
+     public Location(@UndefinedNullability final World world, final double x, final double y, final double z, final float yaw, final float pitch) {
+-        if (world != null) {
+-            this.world = new WeakReference<>(world);
+-        }
+-
++        setWorld(world);
+         this.x = x;
+         this.y = y;
+         this.z = z;
