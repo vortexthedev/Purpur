@@ -1,0 +1,49 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Mon, 14 Oct 2024 23:50:47 +0300
+Subject: [PATCH] Fix furnaces
+
+
+diff --git a/src/main/java/org/bukkit/event/inventory/FurnaceStartSmeltEvent.java b/src/main/java/org/bukkit/event/inventory/FurnaceStartSmeltEvent.java
+index 5f476304598159e9045b116dbbfa191330080210..81e04447ba2b175387758af63fa409f265a98c72 100644
+--- a/src/main/java/org/bukkit/event/inventory/FurnaceStartSmeltEvent.java
++++ b/src/main/java/org/bukkit/event/inventory/FurnaceStartSmeltEvent.java
+@@ -3,9 +3,8 @@ package org.bukkit.event.inventory;
+ import org.bukkit.block.Block;
+ import org.bukkit.event.HandlerList;
+ import org.bukkit.event.block.BlockEvent;
+-import org.bukkit.event.block.InventoryBlockStartEvent;
+-import org.bukkit.inventory.CookingRecipe;
+ import org.bukkit.inventory.ItemStack;
++import org.bukkit.inventory.Recipe;
+ import org.jetbrains.annotations.NotNull;
+ 
+ /**
+@@ -19,16 +18,10 @@ public class FurnaceStartSmeltEvent extends BlockEvent {
+     
+     // Paper - remove HandlerList
+     private ItemStack source; // Paper
+-    private final CookingRecipe<?> recipe;
++    private final Recipe recipe;
+     private int totalCookTime;
+ 
+-    @Deprecated // Paper - furnace cook speed multiplier
+-    public FurnaceStartSmeltEvent(@NotNull final Block furnace, @NotNull ItemStack source, @NotNull final CookingRecipe<?> recipe) {
+-        // Paper start
+-        this(furnace, source, recipe, recipe.getCookingTime());
+-    }
+-
+-    public FurnaceStartSmeltEvent(final @NotNull Block furnace, final @NotNull ItemStack source, final @NotNull CookingRecipe<?> recipe, final int cookingTime) {
++    public FurnaceStartSmeltEvent(final @NotNull Block furnace, final @NotNull ItemStack source, Recipe recipe, final int cookingTime) {
+         // Paper end
+         super(furnace);
+         this.source = source;
+@@ -52,7 +45,7 @@ public class FurnaceStartSmeltEvent extends BlockEvent {
+      * @return the FurnaceRecipe being cooked
+      */
+     @NotNull
+-    public CookingRecipe<?> getRecipe() {
++    public Recipe getRecipe() {
+         return recipe;
+     }
+ 

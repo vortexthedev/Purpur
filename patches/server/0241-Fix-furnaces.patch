@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: xVorttex <sigamatute@gmail.com>
+Date: Mon, 14 Oct 2024 23:50:45 +0300
+Subject: [PATCH] Fix furnaces
+
+
+diff --git a/src/main/java/net/minecraft/world/level/block/entity/TileEntityFurnace.java b/src/main/java/net/minecraft/world/level/block/entity/TileEntityFurnace.java
+index 4e5d5fafd2c068f97c95a5fdfdf00a1252bf747b..5353cdb2cb92326f52ce7a66f59504a58c23ff7f 100644
+--- a/src/main/java/net/minecraft/world/level/block/entity/TileEntityFurnace.java
++++ b/src/main/java/net/minecraft/world/level/block/entity/TileEntityFurnace.java
+@@ -46,7 +46,6 @@ import org.bukkit.event.inventory.FurnaceBurnEvent;
+ import org.bukkit.event.inventory.FurnaceExtractEvent;
+ import org.bukkit.event.inventory.FurnaceSmeltEvent;
+ import org.bukkit.event.inventory.FurnaceStartSmeltEvent;
+-import org.bukkit.inventory.CookingRecipe;
+ 
+ import javax.annotation.Nullable;
+ import java.util.Iterator;
+@@ -369,7 +368,7 @@ public abstract class TileEntityFurnace extends TileEntityContainer implements I
+ 
+                         org.bukkit.inventory.ItemStack source = CraftItemStack.asCraftMirror(items.get(0));
+                         FurnaceStartSmeltEvent event = new FurnaceStartSmeltEvent(CraftBlock.at(world, position),
+-                                source, (CookingRecipe<?>) irecipe.toBukkitRecipe(), getRecipeCookingTime()); // Paper - cook speed multiplier API
++                                source, irecipe != null ? irecipe.toBukkitRecipe() : null, getRecipeCookingTime()); // Paper - cook speed multiplier API
+                         world.getServer().getPluginManager().callEvent(event);
+                         cookTimeTotal = event.getTotalCookTime();
+ 
+@@ -558,7 +557,7 @@ public abstract class TileEntityFurnace extends TileEntityContainer implements I
+             IRecipe irecipe = this.world.getCraftingManager().craft((Recipes<RecipeCooking>) this.c, this, this.world).orElse(null); // Eclipse fail
+             org.bukkit.inventory.ItemStack source = CraftItemStack.asCraftMirror(items.get(0));
+             FurnaceStartSmeltEvent event = new FurnaceStartSmeltEvent(CraftBlock.at(world, position),
+-                    source, (CookingRecipe<?>) irecipe.toBukkitRecipe(), getRecipeCookingTime()); // Paper - cook speed multiplier API
++                    source, irecipe != null ? irecipe.toBukkitRecipe() : null, getRecipeCookingTime()); // Paper - cook speed multiplier API
+             world.getServer().getPluginManager().callEvent(event);
+             this.cookTimeTotal = event.getTotalCookTime();
+             this.cookTime = 0;
